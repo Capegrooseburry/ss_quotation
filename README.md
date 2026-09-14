@@ -37,13 +37,23 @@
    git push -u origin main
    ```
 
-2. **สร้างโปรเจกต์ใน Railway** — railway.app → *New Project* → *Deploy from GitHub repo* → เลือก repo นี้
-   (Nixpacks จะเห็น `requirements.txt` แล้วตั้งเป็นโปรเจกต์ Python ให้เอง)
+2. **สร้างโปรเจกต์และเพิ่มฐานข้อมูลก่อน** — railway.app → *New Project* →
+   *+ New* → *Database* → *Add PostgreSQL*
 
-3. **เพิ่มฐานข้อมูล** — ในโปรเจกต์เดียวกัน กด *+ New* → *Database* → *Add PostgreSQL*
+   > **ทำขั้นนี้ก่อนเพิ่ม service ของแอป** แอปจะหยุดทำงานทันทีที่สตาร์ทถ้ายังไม่มี `DATABASE_URL`
+   > (`db.connect()` ใน `db.py` ตั้งใจให้ล้มพร้อมข้อความชัด ๆ) ถ้าเพิ่มแอปก่อน deploy รอบแรกจะ
+   > **fail แล้ว retry อีก 5 ครั้ง** ตาม `railway.json` — เป็นอาการปกติของการสลับลำดับ ไม่ใช่โค้ดพัง
+   > ผูกตัวแปรในขั้นที่ 4 แล้วกด *Redeploy* ก็ขึ้นปกติ
+
+3. **เพิ่ม service ของแอป** — ในโปรเจกต์เดียวกัน *+ New* → *GitHub Repo* → เลือก repo นี้
+   (Nixpacks จะเห็น `requirements.txt` แล้วตั้งเป็นโปรเจกต์ Python ให้เอง)
+   ถ้าไม่เห็น repo ในรายการ ต้องกด *Configure GitHub App* ให้สิทธิ์ Railway ก่อน
 
 4. **ผูกฐานข้อมูลเข้ากับแอป** — เปิด service ของแอป → แท็บ *Variables* → *New Variable* →
    *Add Reference* → เลือก `DATABASE_URL` ของ Postgres
+
+   ต้องใช้ *Add Reference* เท่านั้น อย่า copy ค่ามาวางเอง — reference จะได้ที่อยู่ภายในเครือข่าย
+   Railway ซึ่งเร็วกว่าและไม่เสียค่า egress
 
 5. **ตั้งรหัสผ่าน** — เพิ่มตัวแปรอีกสองตัวในหน้าเดียวกัน
 
@@ -55,6 +65,17 @@
 6. **เปิดที่อยู่เว็บ** — *Settings* → *Networking* → *Generate Domain*
 
 7. เปิดลิงก์ที่ได้ ใส่รหัสผ่าน — ตารางทั้งหมดถูกสร้างให้อัตโนมัติตอนแอปสตาร์ทครั้งแรก
+
+8. **ตรวจว่าขึ้นจริง** — ใน *Deploy Logs* ต้องเห็นสามบรรทัดนี้เรียงกันตอนสตาร์ท
+
+   ```
+   กำลังเชื่อมต่อฐานข้อมูล postgresql://postgres:***@... (ssl=off)
+   เชื่อมต่อสำเร็จ: database=railway user=postgres · PostgreSQL 16.x
+   schema พร้อมใช้งาน
+   ```
+
+   แล้วเปิด `/healthz` หลังล็อกอิน จะได้ JSON บอกรายชื่อตารางและจำนวนข้อมูลในแต่ละตาราง
+   ใช้ยืนยันได้ว่าโค้ดที่รันอยู่เป็นเวอร์ชันล่าสุดจริง และต่อฐานข้อมูลถูกตัว
 
 ### ลองรันในเครื่องก่อน (แนะนำ)
 
