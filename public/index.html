@@ -1502,12 +1502,35 @@ $("impJson").onchange = async (e) => {
   const f = e.target.files[0]; if (!f) return;
   try {
     const o = JSON.parse(await f.text());
+    /* ลูกค้าและสินค้าต้องมาก่อน เพราะ quotations อ้างถึงด้วย foreign key
+       และ id ในฐานข้อมูลปลายทางไม่จำเป็นต้องตรงกับต้นทาง จึงต้องจับคู่ใหม่ */
+    const custMap = {}, prodMap = {};
+    for (const c of (o.customers||[])){
+      const x = Object.assign({}, c), old = String(c.id || "");
+      delete x.id;
+      const id = await Store.put("customers", x);
+      if (old) custMap[old] = id;
+    }
+    for (const p of (o.products||[])){
+      const x = Object.assign({}, p), old = String(p.id || "");
+      delete x.id;
+      const id = await Store.put("products", x);
+      if (old) prodMap[old] = id;
+    }
     let n = 0;
-    for (const q of (o.quotations||[])){ const c = Object.assign({}, q); delete c.id; await Store.put("quotations", c); n++; }
-    for (const c of (o.customers||[])){ const x = Object.assign({}, c); delete x.id; await Store.put("customers", x); }
-    for (const p of (o.products||[])){ const x = Object.assign({}, p); delete x.id; await Store.put("products", x); }
-    logImp("กู้คืนสำเร็จ " + n + " ใบ");
-  } catch(err){ logImp("ไฟล์ JSON ไม่ถูกต้อง"); }
+    for (const q of (o.quotations||[])){
+      const d = Object.assign({}, q);
+      delete d.id;
+      d.customerId = custMap[String(q.customerId || "")] || "";
+      d.items = (q.items || []).map(i =>
+        Object.assign({}, i, { productId: prodMap[String(i.productId || "")] || "" }));
+      await Store.put("quotations", d);
+      n++;
+    }
+    if (o.config){ Store.config = Object.assign({}, Store.config, o.config); await Store.saveConfig(); }
+    logImp("กู้คืนสำเร็จ " + n + " ใบ · ลูกค้า " + (o.customers||[]).length +
+           " · สินค้า " + (o.products||[]).length);
+  } catch(err){ logImp("กู้คืนไม่สำเร็จ: " + (err && err.message ? err.message : err)); }
   e.target.value = "";
 };
 
