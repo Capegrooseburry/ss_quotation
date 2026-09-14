@@ -114,8 +114,39 @@ async def any_error(_request: Request, exc: Exception):
 
 
 @app.get("/healthz")
-async def healthz():
-    return "ok"
+async def healthz(request: Request):
+    """ตรวจสุขภาพระบบ — Railway ใช้เส้นทางนี้เป็น healthcheck ด้วย
+
+    คนทั่วไปเห็นแค่ว่าต่อฐานข้อมูลได้หรือไม่
+    ถ้าล็อกอินแล้ว (หรือยังไม่ได้ตั้ง APP_PASSWORD) จะเห็นรายละเอียดตารางและจำนวนข้อมูลด้วย
+    ตอบ 503 เมื่อต่อฐานข้อมูลไม่ได้ Railway จะได้ขึ้นว่า deploy ไม่ผ่าน
+    """
+    detail = (not APP_PASSWORD) or _valid(request.cookies.get(COOKIE))
+    out: dict[str, Any] = {"app": "ok", "auth": "on" if APP_PASSWORD else "off"}
+    try:
+        async with db.pool().acquire() as conn:
+            await conn.fetchval("SELECT 1")
+            out["db"] = "ok"
+            if detail:
+                out["database"] = await conn.fetchval("SELECT current_database()")
+                out["postgres"] = (await conn.fetchval("SHOW server_version")).split()[0]
+                rows = await conn.fetch(
+                    "SELECT table_name FROM information_schema.tables "
+                    "WHERE table_schema = 'public' ORDER BY table_name")
+                out["tables"] = [r["table_name"] for r in rows]
+                out["views"] = [r["table_name"] for r in await conn.fetch(
+                    "SELECT table_name FROM information_schema.views "
+                    "WHERE table_schema = 'public' ORDER BY table_name")]
+                out["counts"] = await db.counts(conn)
+                out["latestQuotation"] = await conn.fetchval(
+                    "SELECT no || ' (' || doc_date || ')' FROM quotations "
+                    "ORDER BY doc_date DESC, id DESC LIMIT 1")
+        return out
+    except Exception as e:
+        print("HEALTHCHECK FAILED:", repr(e), flush=True)
+        out["db"] = "error"
+        out["error"] = str(e)
+        return JSONResponse(out, status_code=503)
 
 
 @app.post("/api/login")
@@ -403,6 +434,21 @@ async def save_quotations_bulk(request: Request):
                     created += 1
 
     return {"created": created, "updated": updated, "skipped": skipped}
+
+
+@app.post("/api/seed", dependencies=[Depends(require_auth)])
+async def seed_history():
+    """โหลดใบเสนอราคาย้อนหลังจาก seed_data.sql — รันซ้ำได้ ไม่เกิดข้อมูลซ้ำ"""
+    async with db.pool().acquire() as conn:
+        before = await db.counts(conn)
+    try:
+        await db.seed()
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    async with db.pool().acquire() as conn:
+        after = await db.counts(conn)
+    return {"before": before, "after": after,
+            "added": {k: after[k] - before[k] for k in after}}
 
 
 @app.delete("/api/quotations/{qid}", dependencies=[Depends(require_auth)])

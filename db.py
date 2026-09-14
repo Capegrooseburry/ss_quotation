@@ -31,9 +31,17 @@ async def connect() -> asyncpg.Pool:
         )
     # ต่อภายในเครือข่าย Railway ไม่ต้องใช้ SSL, ต่อจากภายนอกต้องใช้
     ssl = "require" if re.search(r"proxy\.rlwy\.net|\.railway\.app", DATABASE_URL) else None
+    # log แบบไม่เปิดเผยรหัสผ่าน เพื่อให้ดูใน Railway ได้ว่าต่อไปที่ไหน
+    safe = re.sub(r"//([^:/@]+):[^@]*@", r"//\1:***@", DATABASE_URL)
+    print(f"กำลังเชื่อมต่อฐานข้อมูล {safe} (ssl={ssl or 'off'})", flush=True)
     _pool = await asyncpg.create_pool(
         DATABASE_URL, min_size=1, max_size=8, init=_init_conn, ssl=ssl
     )
+    async with _pool.acquire() as conn:
+        who = await conn.fetchrow(
+            "SELECT current_database() AS db, current_user AS usr, version() AS v")
+    print(f"เชื่อมต่อสำเร็จ: database={who['db']} user={who['usr']} · {who['v'].split(',')[0]}",
+          flush=True)
     return _pool
 
 
@@ -54,6 +62,28 @@ async def migrate() -> None:
     async with pool().acquire() as conn:
         await conn.execute(sql)
     print("schema พร้อมใช้งาน", flush=True)
+
+
+COUNT_TABLES = ("quotations", "quotation_items", "customers", "products")
+
+
+async def counts(conn) -> dict[str, int]:
+    """จำนวนแถวของตารางหลัก — ใช้ทั้งใน /healthz และ /api/seed"""
+    return {t: await conn.fetchval(f"SELECT count(*) FROM {t}") for t in COUNT_TABLES}
+
+
+async def seed() -> None:
+    """รัน seed_data.sql — ไฟล์เขียนให้รันซ้ำได้ ใบที่เลขที่+วันที่+ลูกค้าตรงกันจะถูกอัปเดตทับ
+
+    ไฟล์มี BEGIN;/COMMIT; อยู่ในตัวแล้ว จึงห้ามครอบด้วย conn.transaction() ซ้ำ
+    """
+    path = BASE_DIR / "seed_data.sql"
+    if not path.exists():
+        raise FileNotFoundError("ไม่พบไฟล์ seed_data.sql ในเซิร์ฟเวอร์")
+    sql = path.read_text(encoding="utf-8")
+    async with pool().acquire() as conn:
+        await conn.execute(sql)
+    print("โหลด seed_data.sql เรียบร้อย", flush=True)
 
 
 # ---------- ตัวช่วยแปลงค่า ----------

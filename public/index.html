@@ -563,6 +563,12 @@ table.items td:last-child{padding-right:0}
                 <input type="checkbox" id="impReplace" style="width:auto"> ทับใบที่มีเลขที่ซ้ำ
               </label>
             </div>
+            <hr style="border:none;border-top:1px solid var(--line);margin:4px 0">
+            <div class="eyebrow">ข้อมูลย้อนหลังชุดสำเร็จรูป</div>
+            <div class="inline">
+              <button class="btn btn-sm" id="seedBtn">โหลด 167 ใบที่มากับระบบ</button>
+            </div>
+            <div class="hint">ใบเสนอราคาปี 2560–2569 จาก <code>seed_data.sql</code> · กดซ้ำได้ ใบที่เลขที่+วันที่+ลูกค้าตรงกันจะถูกอัปเดตทับ ไม่เกิดข้อมูลซ้ำ</div>
             <div class="log" id="impLog">ยังไม่มีการนำเข้า</div>
           </div>
         </div>
@@ -1503,6 +1509,24 @@ $("impJson").onchange = async (e) => {
     logImp("กู้คืนสำเร็จ " + n + " ใบ");
   } catch(err){ logImp("ไฟล์ JSON ไม่ถูกต้อง"); }
   e.target.value = "";
+};
+
+$("seedBtn").onclick = async () => {
+  const have = Store.quotations.length;
+  if (!confirm(`โหลดใบเสนอราคาย้อนหลังจาก seed_data.sql?\n\nตอนนี้ในระบบมี ${have} ใบ\n` +
+               `ใบที่เลขที่ + วันที่ + ลูกค้า ตรงกันจะถูกอัปเดตทับ ไม่มีการลบข้อมูลเดิม`)) return;
+  const b = $("seedBtn"), label = b.textContent;
+  b.disabled = true; b.textContent = "กำลังโหลด…";
+  logImp("กำลังโหลด seed_data.sql …");
+  try {
+    const r = await Store.call("/seed", { method: "POST" });
+    await Store.init();
+    logImp(`โหลดสำเร็จ · ใบเสนอราคา ${r.before.quotations} → ${r.after.quotations} ใบ · ` +
+           `ลูกค้า ${r.after.customers} · สินค้า ${r.after.products}`);
+    toast("โหลดข้อมูลย้อนหลังเรียบร้อย");
+  } catch (e) {
+    if (String(e.message) !== "unauthorized") logImp("โหลดไม่สำเร็จ: " + e.message);
+  } finally { b.disabled = false; b.textContent = label; }
 };
 
 function logImp(msg){ const l = $("impLog"); l.textContent = (l.textContent === "ยังไม่มีการนำเข้า" ? "" : l.textContent + "\n") + msg; l.scrollTop = l.scrollHeight; }
