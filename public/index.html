@@ -378,8 +378,6 @@ table.items td.it-del{padding-top:9px}
 .a4.modern .m-terms{display:grid;grid-template-columns:auto 1fr;gap:1mm 3mm;margin:0 0 4mm;font-size:11.5px;color:#4b5563}
 .a4.modern .m-terms dt{font-weight:600;color:#374151;white-space:nowrap}
 .a4.modern .m-terms dd{margin:0;white-space:pre-line}
-.a4.modern .m-bank{background:#f9fafb;border:1px solid #e5e7eb;border-radius:4px;padding:2.5mm 3mm;font-size:12.5px}
-.a4.modern .m-bank b{font-weight:600;margin-right:2mm}
 .a4.modern .m-totals table{width:100%;border-collapse:collapse;font-size:13px}
 .a4.modern .m-totals th{text-align:right;font-weight:600;color:#374151;padding:2mm;border-bottom:1px solid #e5e7eb}
 .a4.modern .m-totals td{text-align:right;padding:2mm 0 2mm 2mm;border-bottom:1px solid #e5e7eb;width:34mm;
@@ -807,13 +805,8 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
           <div class="eyebrow" style="margin-top:6px">ใบเสนอราคาแบบใหม่</div>
           <div class="grid g2">
             <label class="f"><span>ยืนราคาตั้งต้น (วัน)</span><input type="number" id="s_valid" min="0" step="1" class="num"></label>
-            <label class="f"><span>ธนาคารและสาขา</span><input type="text" id="s_bank"></label>
           </div>
-          <div class="grid g2">
-            <label class="f"><span>ชื่อบัญชี</span><input type="text" id="s_bankName"></label>
-            <label class="f"><span>เลขที่บัญชี</span><input type="text" id="s_bankNo"></label>
-          </div>
-          <div class="hint">กล่องบัญชีธนาคารแสดงบนใบแบบใหม่เมื่อกรอกเลขที่บัญชี · ใบย้อนหลังยังพิมพ์แบบหนังสือเดิม · ถ้าเงื่อนไข “เงื่อนไขการชำระเงิน” ตั้งต้นด้านล่างมีเลขบัญชีอยู่แล้ว ควรตัดออก จะได้ไม่แสดงซ้ำสองที่</div>
+          <div class="hint">ใบย้อนหลังยังพิมพ์แบบหนังสือเดิม · เลขที่บัญชีสำหรับโอนเงินให้ใส่ไว้ในเงื่อนไข “เงื่อนไขการชำระเงิน” ด้านล่าง</div>
           <label class="f"><span>รูปแบบเลขที่หนังสือ</span>
             <input type="text" id="s_pattern">
           </label>
@@ -923,9 +916,6 @@ const DEFAULT_CONFIG = {
   vatRate: 7,
   docNoPattern: "{MM}{DD}{NN}/{BE}",
   validDays: 30,
-  bankName: "ธนาคารกรุงไทย จำกัด (มหาชน) สาขาอู่ทอง",
-  bankAccountName: "บริษัท เอส แอนด์ เอส อินคอม จำกัด",
-  bankAccountNo: "725-1-28360-3",
   defaultIntro: "บริษัทฯ มีความยินดีขอเสนอราคาทรายคัดขนาดพิเศษ เพื่อให้ท่านพิจารณาจัดซื้อดังรายละเอียดต่อไปนี้",
   defaultTerms: [
     {label:"การส่งมอบ", value:"3 วัน ภายหลังจากที่ได้รับใบสั่งซื้อ"},
@@ -1163,12 +1153,6 @@ function renderDocModern(q){
     .concat((q.terms||[]).filter(x => (x.label||"").trim() || (x.value||"").trim()));
   const termsHtml = terms.length ? `<h4>เงื่อนไขการเสนอราคา <small>(Terms &amp; Conditions)</small></h4>
     <dl class="m-terms">${terms.map(x => `<dt>${esc(x.label)}</dt><dd>${esc(x.value)}</dd>`).join("")}</dl>` : "";
-  const bank = c.bankAccountNo ? `<h4>รายละเอียดบัญชี <small>(Bank Details)</small></h4>
-    <div class="m-bank">${lines([
-      c.bankName ? `<b>ธนาคาร</b>${esc(c.bankName)}` : "",
-      c.bankAccountName ? `<b>ชื่อบัญชี</b>${esc(c.bankAccountName)}` : "",
-      `<b>เลขที่บัญชี</b>${esc(c.bankAccountNo)}`
-    ])}</div>` : "";
   const sumRow = (th, en, v, cls) => `<tr class="${cls||""}"><th>${th}<small>${en}</small></th><td>${v}</td></tr>`;
   const totals = isPrice ? "" : `<div class="m-totals"><table>
       ${sumRow("รวมเป็นเงิน", "Subtotal", money(t.sub))}
@@ -1208,7 +1192,7 @@ function renderDocModern(q){
     ${q.intro ? `<p class="m-intro">${esc(q.intro)}</p>` : ""}
     <table class="m-items"><thead>${thead}</thead><tbody>${rows}</tbody></table>
     <section class="m-summary${isPrice ? " full" : ""}">
-      <div class="m-left">${termsHtml}${bank}</div>
+      <div class="m-left">${termsHtml}</div>
       ${totals}
     </section>
     <section class="m-signs">
@@ -1809,8 +1793,7 @@ function fillSettings(){
   $("s_showTax").checked = !!c.showTaxId; $("s_signer").value = c.signerName||"";
   $("s_signerTitle").value = c.signerTitle||""; $("s_vat").value = c.vatRate;
   $("s_pattern").value = c.docNoPattern||""; $("s_intro").value = c.defaultIntro||"";
-  $("s_valid").value = c.validDays ?? ""; $("s_bank").value = c.bankName||"";
-  $("s_bankName").value = c.bankAccountName||""; $("s_bankNo").value = c.bankAccountNo||"";
+  $("s_valid").value = c.validDays ?? "";
   const host = $("s_terms"); host.innerHTML = "";
   c.defaultTerms.forEach((t,i) => host.appendChild(termRow(t, () => { c.defaultTerms.splice(i,1); fillSettings(); }, () => {})));
 }
@@ -1824,7 +1807,8 @@ $("s_save").onclick = async () => {
   c.signerName = $("s_signer").value; c.signerTitle = $("s_signerTitle").value;
   c.vatRate = Number($("s_vat").value)||7; c.docNoPattern = $("s_pattern").value; c.defaultIntro = $("s_intro").value;
   const vd = $("s_valid").value.trim(); c.validDays = vd === "" ? null : Math.max(0, parseInt(vd, 10) || 0);
-  c.bankName = $("s_bank").value.trim(); c.bankAccountName = $("s_bankName").value.trim(); c.bankAccountNo = $("s_bankNo").value.trim();
+  // เลิกใช้กล่องบัญชีธนาคารแล้ว (ซ้ำกับเงื่อนไขการชำระเงิน) — ล้างค่าเก่าที่ค้างในฐานข้อมูล
+  delete c.bankName; delete c.bankAccountName; delete c.bankAccountNo;
   await Store.saveConfig(); toast("บันทึกการตั้งค่าแล้ว"); renderRegistry();
 };
 
@@ -2493,7 +2477,7 @@ function buildDocXmlModern(q){
   }
   body += wP("", {after:160});
 
-  // สรุป: เงื่อนไขและบัญชีธนาคารซ้าย ยอดเงินขวา
+  // สรุป: เงื่อนไขซ้าย ยอดเงินขวา
   const leftW = isPrice ? W : 5250;
   const terms = (q.vatMode === "exclude" ? [{label:"ภาษีมูลค่าเพิ่ม", value:"ราคานี้ไม่รวมภาษีมูลค่าเพิ่ม (VAT " + t.rate + "%)"}] : [])
     .concat((q.terms||[]).filter(x => (x.label||"").trim() || (x.value||"").trim()));
@@ -2501,13 +2485,6 @@ function buildDocXmlModern(q){
   if (terms.length){
     left += wP("เงื่อนไขการเสนอราคา (Terms & Conditions)", {b:true, sz:26, after:60});
     left += terms.map(x => para(wRun((x.label||"") + "  ", {b:true, sz:22}) + wRun(x.value, {sz:22, color:MUTED}), 40)).join("");
-  }
-  if (c.bankAccountNo){
-    const bankRows = [["ธนาคาร", c.bankName], ["ชื่อบัญชี", c.bankAccountName], ["เลขที่บัญชี", c.bankAccountNo]].filter(r => r[1]);
-    left += wP("รายละเอียดบัญชี (Bank Details)", {b:true, sz:26, before:120, after:60});
-    left += tbl([leftW - 100], `<w:tr>${wCellXml(leftW - 100,
-      bankRows.map(([k, v]) => para(wRun(k + "  ", {b:true, sz:24}) + wRun(v, {sz:24}))).join(""),
-      {shade:GREY, borders:box(LINE), pad:100})}</w:tr>`);
   }
   if (isPrice){
     body += tbl([W], `<w:tr>${wCellXml(W, left || wP(""))}</w:tr>`);
