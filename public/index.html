@@ -1163,7 +1163,7 @@ function nextDocNo(iso){
     .replace("{NN}", nn);
   if (pattern.includes("{NN}")){
     // ลำดับในวัน = เลขสูงสุดของวันนั้นที่มีอยู่ + 1 ไม่ใช้การนับ เพราะลบใบกลาง ๆ ทิ้งแล้วเลขจะชน
-    const mark = " ";
+    const mark = "\u0000";
     const re = new RegExp("^" + fill(mark).replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(mark, "(\\d{2,})") + "$");
     let n = Store.quotations.reduce((m, q) => {
       const x = re.exec(String(q.no||"").trim());
