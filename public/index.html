@@ -294,7 +294,7 @@ table.items td:last-child{padding-right:0}
 .a4.modern .m-summary{display:grid;grid-template-columns:1fr 78mm;gap:8mm;align-items:start;margin-bottom:8mm;break-inside:avoid}
 .a4.modern .m-summary.full{grid-template-columns:1fr}
 .a4.modern .m-left h4{font-size:13.5px;font-weight:700;color:#1f2937;margin:0 0 1.5mm}
-.a4.modern .m-terms{display:grid;grid-template-columns:auto 1fr;gap:1mm 3mm;margin:0 0 4mm;font-size:12.5px;color:#4b5563}
+.a4.modern .m-terms{display:grid;grid-template-columns:auto 1fr;gap:1mm 3mm;margin:0 0 4mm;font-size:11.5px;color:#4b5563}
 .a4.modern .m-terms dt{font-weight:600;color:#374151;white-space:nowrap}
 .a4.modern .m-terms dd{margin:0;white-space:pre-line}
 .a4.modern .m-bank{background:#f9fafb;border:1px solid #e5e7eb;border-radius:4px;padding:2.5mm 3mm;font-size:12.5px}
@@ -2393,7 +2393,7 @@ function buildDocXmlModern(q){
   let left = "";
   if (terms.length){
     left += wP("เงื่อนไขการเสนอราคา (Terms & Conditions)", {b:true, sz:26, after:60});
-    left += terms.map(x => para(wRun((x.label||"") + "  ", {b:true, sz:24}) + wRun(x.value, {sz:24, color:MUTED}), 40)).join("");
+    left += terms.map(x => para(wRun((x.label||"") + "  ", {b:true, sz:22}) + wRun(x.value, {sz:22, color:MUTED}), 40)).join("");
   }
   if (c.bankAccountNo){
     const bankRows = [["ธนาคาร", c.bankName], ["ชื่อบัญชี", c.bankAccountName], ["เลขที่บัญชี", c.bankAccountNo]].filter(r => r[1]);
