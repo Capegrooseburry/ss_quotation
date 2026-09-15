@@ -40,6 +40,10 @@ DEFAULT_CONFIG: dict[str, Any] = {
     "signerTitle": "กรรมการ",
     "vatRate": 7,
     "docNoPattern": "{MM}{DD}{NN}/{BE}",
+    "validDays": 30,
+    "bankName": "ธนาคารกรุงไทย จำกัด (มหาชน) สาขาอู่ทอง",
+    "bankAccountName": "บริษัท เอส แอนด์ เอส อินคอม จำกัด",
+    "bankAccountNo": "725-1-28360-3",
     "defaultIntro": "บริษัทฯ มีความยินดีขอเสนอราคาทรายคัดขนาดพิเศษ เพื่อให้ท่านพิจารณาจัดซื้อดังรายละเอียดต่อไปนี้",
     "defaultTerms": [
         {"label": "การส่งมอบ", "value": "3 วัน ภายหลังจากที่ได้รับใบสั่งซื้อ"},
@@ -198,6 +202,10 @@ def to_quotation(q, items, terms) -> dict:
         "signerTitle": q["signer_title"],
         "note": q["note"],
         "source": {"kind": q["source_kind"], "file": q["source_file"]},
+        "layout": q["layout"],
+        "validDays": q["valid_days"],
+        "custEmail": q["cust_email"],
+        "custTaxId": q["cust_tax_id"],
         "items": [
             {
                 "productId": str(i["product_id"]) if i["product_id"] else "",
@@ -218,7 +226,8 @@ def to_quotation(q, items, terms) -> dict:
 def to_customer(c) -> dict:
     return {
         "id": str(c["id"]), "code": c["code"] or "", "name": c["name"], "nameKey": c["name_key"],
-        "attn": c["attn"], "addr": c["addr"], "phone": c["phone"], "tax": c["tax_id"], "note": c["note"],
+        "attn": c["attn"], "addr": c["addr"], "phone": c["phone"], "tax": c["tax_id"], "email": c["email"],
+        "note": c["note"],
     }
 
 
@@ -310,6 +319,11 @@ async def upsert_quotation(conn, d: dict) -> int:
         (d.get("source") or {}).get("kind") or "manual",
         (d.get("source") or {}).get("file") or "",
         search_text,
+        # ใบที่ไม่ระบุรูปแบบ (นำเข้าจาก Word / กู้คืนจากไฟล์สำรองรุ่นเก่า) พิมพ์แบบหนังสือเดิม
+        d.get("layout") if d.get("layout") in ("letter", "modern") else "letter",
+        int(d["validDays"]) if str(d.get("validDays", "")).strip().isdigit() else None,
+        d.get("custEmail") or "",
+        d.get("custTaxId") or "",
     )
 
     qid = int(d["id"]) if str(d.get("id") or "").isdigit() else None
@@ -328,8 +342,9 @@ async def upsert_quotation(conn, d: dict) -> int:
                  customer_id=$7, customer_name=$8, attn=$9, addr=$10, phone=$11, intro=$12,
                  form_type=$13, doc_kind=$14, vat_mode=$15, vat_rate=$16,
                  subtotal=$17, vat=$18, total=$19, status=$20, signer_name=$21, signer_title=$22,
-                 note=$23, source_kind=$24, source_file=$25, search_text=$26, updated_at=now()
-               WHERE id=$27""",
+                 note=$23, source_kind=$24, source_file=$25, search_text=$26,
+                 layout=$27, valid_days=$28, cust_email=$29, cust_tax_id=$30, updated_at=now()
+               WHERE id=$31""",
             *vals, qid,
         )
     else:
@@ -346,15 +361,17 @@ async def upsert_quotation(conn, d: dict) -> int:
                  status=EXCLUDED.status, signer_name=EXCLUDED.signer_name,
                  signer_title=EXCLUDED.signer_title, note=EXCLUDED.note,
                  source_kind=EXCLUDED.source_kind, source_file=EXCLUDED.source_file,
-                 search_text=EXCLUDED.search_text, updated_at=now()"""
+                 search_text=EXCLUDED.search_text, layout=EXCLUDED.layout,
+                 valid_days=EXCLUDED.valid_days, cust_email=EXCLUDED.cust_email,
+                 cust_tax_id=EXCLUDED.cust_tax_id, updated_at=now()"""
         qid = await conn.fetchval(
             """INSERT INTO quotations (
                  no, dedupe_key, doc_date, period_from, period_to, subject, customer_id,
                  customer_name, attn, addr, phone, intro, form_type, doc_kind, vat_mode, vat_rate,
                  subtotal, vat, total, status, signer_name, signer_title, note,
-                 source_kind, source_file, search_text)
+                 source_kind, source_file, search_text, layout, valid_days, cust_email, cust_tax_id)
                VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,
-                       $17,$18,$19,$20,$21,$22,$23,$24,$25,$26)
+                       $17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30)
                ON CONFLICT (dedupe_key) """ + on_conflict + """
                RETURNING id""",
             *vals,
@@ -484,20 +501,22 @@ async def save_customer(request: Request):
         raise HTTPException(status_code=400, detail="กรอกชื่อลูกค้า")
     key = d.get("nameKey") or nkey(name)
     args = (name, key, d.get("attn") or "", d.get("addr") or "",
-            d.get("phone") or "", d.get("tax") or "", d.get("note") or "")
+            d.get("phone") or "", d.get("tax") or "", d.get("note") or "", d.get("email") or "")
     async with db.pool().acquire() as conn:
         if str(d.get("id") or "").isdigit():
             row = await conn.fetchrow(
                 """UPDATE customers SET name=$1, name_key=$2, attn=$3, addr=$4, phone=$5,
-                     tax_id=$6, note=$7, updated_at=now() WHERE id=$8 RETURNING *""",
+                     tax_id=$6, note=$7, email=$8, updated_at=now() WHERE id=$9 RETURNING *""",
                 *args, int(d["id"]),
             )
         else:
+            # ไฟล์สำรองรุ่นก่อนมีช่องอีเมลจะส่งอีเมลว่างมา อย่าให้ลบอีเมลที่มีอยู่แล้วทิ้ง
             row = await conn.fetchrow(
-                """INSERT INTO customers (name, name_key, attn, addr, phone, tax_id, note)
-                   VALUES ($1,$2,$3,$4,$5,$6,$7)
+                """INSERT INTO customers (name, name_key, attn, addr, phone, tax_id, note, email)
+                   VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
                    ON CONFLICT (name_key) DO UPDATE SET name=EXCLUDED.name, attn=EXCLUDED.attn,
                      addr=EXCLUDED.addr, phone=EXCLUDED.phone, tax_id=EXCLUDED.tax_id,
+                     email=COALESCE(NULLIF(EXCLUDED.email, ''), customers.email),
                      updated_at=now()
                    RETURNING *""",
                 *args,

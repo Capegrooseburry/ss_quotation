@@ -261,6 +261,57 @@ table.items td:last-child{padding-right:0}
 .a4 .close{text-indent:2.2em;margin:12px 0 22px}
 .a4 .sign{text-align:center;width:78mm;margin-left:auto;line-height:1.7}
 .a4 .sign .dots{letter-spacing:.06em}
+
+/* ---------- A4 แบบใบเสนอราคาเชิงพาณิชย์ (layout = modern) ---------- */
+.a4.modern{font-size:14px;line-height:1.5;color:#1f2937}
+.a4.modern small{display:block;font-size:10.5px;font-weight:400;opacity:.8;line-height:1.25}
+.a4.modern .m-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8mm;
+  border-bottom:2px solid #9ca3af;padding-bottom:5mm;margin-bottom:5mm}
+.a4.modern .m-co{display:flex;gap:4mm;align-items:flex-start;min-width:0}
+.a4.modern .m-logo{width:20mm;height:auto;flex:none}
+.a4.modern .m-co-th{font-size:19px;font-weight:700;color:#111827;line-height:1.25}
+.a4.modern .m-co-en{font-size:12px;font-weight:600;letter-spacing:.08em;color:#6b7280}
+.a4.modern .m-co-contact{font-size:11.5px;color:#4b5563;margin-top:1.5mm}
+.a4.modern .m-title{text-align:right;flex:none}
+.a4.modern .m-title-th{font-size:26px;font-weight:700;color:#1f2937;line-height:1.15}
+.a4.modern .m-title-en{font-size:15px;font-weight:600;letter-spacing:.18em;color:#6b7280;margin-bottom:2.5mm}
+.a4.modern .m-meta{border-collapse:collapse;font-size:12.5px;margin-left:auto}
+.a4.modern .m-meta th{font-weight:600;color:#374151;text-align:left;padding:0 3mm 1px 0;white-space:nowrap}
+.a4.modern .m-meta td{color:#111827;text-align:left;white-space:nowrap;font-variant-numeric:tabular-nums}
+.a4.modern .m-cust{background:#f9fafb;border:1px solid #f3f4f6;border-radius:4px;padding:3.5mm 4mm;margin-bottom:5mm}
+.a4.modern .m-cust-h{font-weight:700;color:#1f2937;border-bottom:1px solid #e5e7eb;padding-bottom:1.5mm;margin-bottom:2.5mm}
+.a4.modern .m-cust-b{display:grid;grid-template-columns:1.4fr 1fr;gap:5mm;font-size:13px;color:#4b5563}
+.a4.modern .m-cust-name{font-size:15px;font-weight:700;color:#111827}
+.a4.modern .m-pre{white-space:pre-line}
+.a4.modern .m-subject{margin-bottom:1.5mm}
+.a4.modern .m-intro{margin:0 0 4mm;text-indent:2.2em;text-align:justify}
+.a4.modern table.m-items{width:100%;border-collapse:collapse;font-size:13.5px;margin-bottom:5mm}
+.a4.modern .m-items th{background:#374151;color:#fff;font-weight:600;padding:2mm 2.5mm;text-align:left;vertical-align:bottom;line-height:1.3}
+.a4.modern .m-items td{padding:2mm 2.5mm;border-bottom:1px solid #e5e7eb;vertical-align:top}
+.a4.modern .m-items tbody tr:nth-child(even) td{background:#f9fafb}
+.a4.modern .m-items .c{text-align:center}
+.a4.modern .m-items .r{text-align:right;font-variant-numeric:tabular-nums}
+.a4.modern .m-summary{display:grid;grid-template-columns:1fr 78mm;gap:8mm;align-items:start;margin-bottom:8mm;break-inside:avoid}
+.a4.modern .m-summary.full{grid-template-columns:1fr}
+.a4.modern .m-left h4{font-size:13.5px;font-weight:700;color:#1f2937;margin:0 0 1.5mm}
+.a4.modern .m-terms{display:grid;grid-template-columns:auto 1fr;gap:1mm 3mm;margin:0 0 4mm;font-size:12.5px;color:#4b5563}
+.a4.modern .m-terms dt{font-weight:600;color:#374151;white-space:nowrap}
+.a4.modern .m-terms dd{margin:0;white-space:pre-line}
+.a4.modern .m-bank{background:#f9fafb;border:1px solid #e5e7eb;border-radius:4px;padding:2.5mm 3mm;font-size:12.5px}
+.a4.modern .m-bank b{font-weight:600;margin-right:2mm}
+.a4.modern .m-totals table{width:100%;border-collapse:collapse;font-size:13px}
+.a4.modern .m-totals th{text-align:right;font-weight:600;color:#374151;padding:2mm;border-bottom:1px solid #e5e7eb}
+.a4.modern .m-totals td{text-align:right;padding:2mm 0 2mm 2mm;border-bottom:1px solid #e5e7eb;width:34mm;
+  font-variant-numeric:tabular-nums;color:#111827}
+.a4.modern .m-totals tr.grand th,.a4.modern .m-totals tr.grand td{background:#f3f4f6;font-weight:700;font-size:15px;
+  color:#111827;border-bottom:3px solid #4b5563;padding:3mm 2mm}
+.a4.modern .m-words{text-align:center;font-size:12px;color:#6b7280;font-style:italic;margin-top:2mm}
+.a4.modern .m-signs{display:grid;grid-template-columns:1fr 1fr;gap:12mm;margin-top:10mm;break-inside:avoid}
+.a4.modern .m-sign{text-align:center;font-size:13px;color:#4b5563}
+.a4.modern .m-sign-line{height:18mm;border-bottom:1px solid #9ca3af;margin:0 10% 2mm}
+.a4.modern .m-sign-name{font-weight:600;color:#1f2937}
+.a4.modern .m-cust-h small,.a4.modern .m-left h4 small,.a4.modern .m-sign small{display:inline;font-size:11px}
+.a4.modern .m-sign-date{color:#6b7280;margin-top:1mm}
 @media (max-width:1120px){.a4{box-shadow:none;margin:0}}
 
 .overlay{position:fixed;inset:0;background:rgba(12,18,24,.72);z-index:60;overflow:auto;padding:0 0 40px}
@@ -420,7 +471,10 @@ table.items td:last-child{padding-right:0}
                   </select>
                 </label>
               </div>
-              <label class="f"><span>เรื่อง</span><input type="text" id="e_subject" placeholder="ขอเสนอราคาทรายคัดขนาดพิเศษ"></label>
+              <div class="inline" style="align-items:end">
+                <label class="f" style="flex:1;min-width:240px"><span>เรื่อง</span><input type="text" id="e_subject" placeholder="ขอเสนอราคาทรายคัดขนาดพิเศษ"></label>
+                <label class="f" style="width:140px"><span>ยืนราคา (วัน)</span><input type="number" id="e_valid" min="0" step="1" class="num" placeholder="30"></label>
+              </div>
               <div class="grid g2">
                 <label class="f"><span>เรียน (ผู้รับ / ตำแหน่ง / บริษัท)</span>
                   <textarea id="e_attn" rows="2" placeholder="ฝ่ายจัดซื้อ บริษัท ..."></textarea>
@@ -428,6 +482,11 @@ table.items td:last-child{padding-right:0}
                 <label class="f"><span>ที่อยู่ผู้รับ</span>
                   <textarea id="e_addr" rows="2"></textarea>
                 </label>
+              </div>
+              <div class="grid g3">
+                <label class="f"><span>โทรศัพท์ผู้รับ</span><input type="text" id="e_phone"></label>
+                <label class="f"><span>อีเมลผู้รับ</span><input type="email" id="e_email"></label>
+                <label class="f"><span>เลขประจำตัวผู้เสียภาษีผู้รับ</span><input type="text" id="e_taxId" inputmode="numeric"></label>
               </div>
               <div class="inline">
                 <label class="f" style="flex:1;min-width:200px"><span>เลือกลูกค้าจากทะเบียน</span>
@@ -523,6 +582,7 @@ table.items td:last-child{padding-right:0}
               <label class="f"><span>โทรศัพท์</span><input type="text" id="c_phone"></label>
               <label class="f"><span>เลขประจำตัวผู้เสียภาษี</span><input type="text" id="c_tax"></label>
             </div>
+            <label class="f"><span>อีเมล</span><input type="email" id="c_email"></label>
             <div class="inline"><button class="btn btn-primary btn-sm" id="c_add">เพิ่ม / อัปเดตลูกค้า</button>
               <button class="btn btn-sm" id="c_clear">ล้างฟอร์ม</button></div>
           </div>
@@ -646,6 +706,16 @@ table.items td:last-child{padding-right:0}
             <label class="f"><span>ตำแหน่ง</span><input type="text" id="s_signerTitle"></label>
             <label class="f"><span>อัตราภาษี (%)</span><input type="number" id="s_vat" step="0.01" class="num"></label>
           </div>
+          <div class="eyebrow" style="margin-top:6px">ใบเสนอราคาแบบใหม่</div>
+          <div class="grid g2">
+            <label class="f"><span>ยืนราคาตั้งต้น (วัน)</span><input type="number" id="s_valid" min="0" step="1" class="num"></label>
+            <label class="f"><span>ธนาคารและสาขา</span><input type="text" id="s_bank"></label>
+          </div>
+          <div class="grid g2">
+            <label class="f"><span>ชื่อบัญชี</span><input type="text" id="s_bankName"></label>
+            <label class="f"><span>เลขที่บัญชี</span><input type="text" id="s_bankNo"></label>
+          </div>
+          <div class="hint">กล่องบัญชีธนาคารแสดงบนใบแบบใหม่เมื่อกรอกเลขที่บัญชี · ใบย้อนหลังยังพิมพ์แบบหนังสือเดิม · ถ้าเงื่อนไข “เงื่อนไขการชำระเงิน” ตั้งต้นด้านล่างมีเลขบัญชีอยู่แล้ว ควรตัดออก จะได้ไม่แสดงซ้ำสองที่</div>
           <label class="f"><span>รูปแบบเลขที่หนังสือ</span>
             <input type="text" id="s_pattern">
           </label>
@@ -700,6 +770,33 @@ const el = (tag, cls, txt) => { const n = document.createElement(tag); if (cls) 
 const esc = (s) => String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 const money = (n) => (Number(n)||0).toLocaleString("en-US",{minimumFractionDigits:2, maximumFractionDigits:2});
 const qty = (n) => { const v = Number(n)||0; return Number.isInteger(v) ? String(v) : v.toLocaleString("en-US",{maximumFractionDigits:3}); };
+/* จำนวนเงินเป็นตัวอักษรไทย เช่น 43335 → "สี่หมื่นสามพันสามร้อยสามสิบห้าบาทถ้วน" */
+function bahtText(n){
+  const DIGIT = ["","หนึ่ง","สอง","สาม","สี่","ห้า","หก","เจ็ด","แปด","เก้า"];
+  const PLACE = ["","สิบ","ร้อย","พัน","หมื่น","แสน"];
+  // อ่านทีละกลุ่มไม่เกินหกหลัก · lead = มีกลุ่มหลักล้านอยู่ข้างหน้า หลักหน่วยที่เป็น 1 จึงอ่าน "เอ็ด"
+  const group = (s, lead) => {
+    let out = "";
+    for (let i = 0; i < s.length; i++){
+      const d = Number(s[i]), pos = s.length - i - 1;
+      if (!d) continue;
+      if (pos === 1) out += (d === 1 ? "" : d === 2 ? "ยี่" : DIGIT[d]) + "สิบ";
+      else if (pos === 0 && d === 1 && (lead || /[1-9]/.test(s.slice(0, -1)))) out += "เอ็ด";
+      else out += DIGIT[d] + PLACE[pos];
+    }
+    return out;
+  };
+  const read = (s) => {
+    s = s.replace(/^0+/, "");
+    if (s.length <= 6) return group(s, false);
+    return read(s.slice(0, -6)) + "ล้าน" + group(s.slice(-6), true);
+  };
+  const v = Math.round(Math.abs(Number(n) || 0) * 100);
+  const baht = read(String(Math.floor(v / 100))), satang = v % 100;
+  if (!baht && !satang) return "ศูนย์บาทถ้วน";
+  return (Number(n) < 0 ? "ลบ" : "") + (baht ? baht + "บาท" : "")
+    + (satang ? group(String(satang), false) + "สตางค์" : "ถ้วน");
+}
 const uid = () => "q" + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
 /* nameKey — คีย์เทียบชื่อสินค้า/ลูกค้าแบบไม่สนช่องว่าง ตัวพิมพ์ และชนิดขีด
    ใช้จับคู่รายการที่พิมพ์ชื่อต่างกันเล็กน้อยให้เป็นสินค้าเดียวกัน */
@@ -727,6 +824,10 @@ const DEFAULT_CONFIG = {
   signerTitle: "กรรมการ",
   vatRate: 7,
   docNoPattern: "{MM}{DD}{NN}/{BE}",
+  validDays: 30,
+  bankName: "ธนาคารกรุงไทย จำกัด (มหาชน) สาขาอู่ทอง",
+  bankAccountName: "บริษัท เอส แอนด์ เอส อินคอม จำกัด",
+  bankAccountNo: "725-1-28360-3",
   defaultIntro: "บริษัทฯ มีความยินดีขอเสนอราคาทรายคัดขนาดพิเศษ เพื่อให้ท่านพิจารณาจัดซื้อดังรายละเอียดต่อไปนี้",
   defaultTerms: [
     {label:"การส่งมอบ", value:"3 วัน ภายหลังจากที่ได้รับใบสั่งซื้อ"},
@@ -842,6 +943,10 @@ function unitLabel(q){
 
 /* ---------------- document render (A4) ---------------- */
 function renderDoc(q){
+  return q.layout === "modern" ? renderDocModern(q) : renderDocLetter(q);
+}
+/* แบบหนังสือทางการเดิม — ใบย้อนหลังและใบที่นำเข้าใช้แบบนี้ พิมพ์ซ้ำจึงได้หน้าตาเดียวกับที่ส่งลูกค้าไปแล้ว */
+function renderDocLetter(q){
   const c = Store.config, t = calc(q);
   const items = q.items || [];
   let head = "", rows = "", sumTable = "";
@@ -908,6 +1013,111 @@ function renderDoc(q){
       <div>( ${esc(q.signerName || c.signerName)} )</div>
       <div>${esc(q.signerTitle || c.signerTitle)}</div>
     </div>
+  </div>`;
+}
+
+/* แบบใบเสนอราคาเชิงพาณิชย์ — ใบที่สร้างหรือสำเนาจากฟอร์มหลังเพิ่มรูปแบบนี้ */
+function renderDocModern(q){
+  const c = Store.config, t = calc(q);
+  const items = (q.items || []).filter(it => String(it.name||"").trim());
+  const isPrice = q.formType === "price";
+  const unit = items.map(i => i.unit).filter(Boolean)[0] || "ตัน";
+  const lines = (arr) => arr.filter(Boolean).map(s => `<div>${s}</div>`).join("");
+
+  const company = c.showLetterhead ? `<div class="m-co">
+      ${c.showLogo === false ? "" : `<img class="m-logo" src="${LOGO}" alt="">`}
+      <div>
+        <div class="m-co-th">${esc(c.companyName)}</div>
+        ${c.companyNameEn ? `<div class="m-co-en">${esc(c.companyNameEn)}</div>` : ""}
+        <div class="m-co-contact">${lines([
+          c.companyAddr ? esc(c.companyAddr) : "",
+          [c.phone ? "โทร. " + esc(c.phone) : "", c.website ? esc(c.website) : ""].filter(Boolean).join(" · "),
+          (c.showTaxId && c.taxId) ? "เลขประจำตัวผู้เสียภาษี " + esc(c.taxId) : ""
+        ])}</div>
+      </div>
+    </div>` : `<div></div>`;
+  const meta = [
+    ["เลขที่ (No.)", esc(q.no)],
+    ["วันที่ (Date)", esc(thaiDate(q.dateISO))],
+    q.validDays != null && q.validDays !== "" ? ["ยืนราคา (Valid)", esc(q.validDays) + " วัน"] : null
+  ].filter(Boolean).map(([k, v]) => `<tr><th>${k}</th><td>${v}</td></tr>`).join("");
+
+  const custName = q.customerName || String(q.attn||"").split("\n")[0];
+  const attnLine = q.attn && q.attn !== custName ? q.attn : "";
+  const contact = lines([
+    q.phone ? "โทร. " + esc(q.phone) : "",
+    q.custEmail ? "อีเมล " + esc(q.custEmail) : "",
+    q.custTaxId ? "เลขประจำตัวผู้เสียภาษี " + esc(q.custTaxId) : ""
+  ]);
+
+  const thead = isPrice
+    ? `<tr><th class="c" style="width:14mm">ลำดับ<small>Item</small></th><th>รายการสินค้า<small>Description</small></th>
+        <th class="c" style="width:20mm">หน่วย<small>Unit</small></th><th class="r" style="width:34mm">ราคา/หน่วย<small>Unit Price</small></th></tr>`
+    : `<tr><th class="c" style="width:14mm">ลำดับ<small>Item</small></th><th>รายการสินค้า<small>Description</small></th>
+        <th class="c" style="width:24mm">จำนวน (${esc(unit)})<small>Qty</small></th><th class="r" style="width:30mm">ราคา/หน่วย<small>Unit Price</small></th>
+        <th class="r" style="width:32mm">จำนวนเงิน<small>Amount</small></th></tr>`;
+  const rows = items.map((it, i) => isPrice
+    ? `<tr><td class="c">${i+1}</td><td>${esc(it.name)}</td><td class="c">${esc(it.unit||unit)}</td><td class="r">${money(it.price)}</td></tr>`
+    : `<tr><td class="c">${i+1}</td><td>${esc(it.name)}</td><td class="c">${qty(it.qty)}</td><td class="r">${money(it.price)}</td>
+        <td class="r">${money((Number(it.qty)||0)*(Number(it.price)||0))}</td></tr>`).join("");
+
+  const terms = (q.vatMode === "exclude" ? [{label:"ภาษีมูลค่าเพิ่ม", value:`ราคานี้ไม่รวมภาษีมูลค่าเพิ่ม (VAT ${t.rate}%)`}] : [])
+    .concat((q.terms||[]).filter(x => (x.label||"").trim() || (x.value||"").trim()));
+  const termsHtml = terms.length ? `<h4>เงื่อนไขการเสนอราคา <small>(Terms &amp; Conditions)</small></h4>
+    <dl class="m-terms">${terms.map(x => `<dt>${esc(x.label)}</dt><dd>${esc(x.value)}</dd>`).join("")}</dl>` : "";
+  const bank = c.bankAccountNo ? `<h4>รายละเอียดบัญชี <small>(Bank Details)</small></h4>
+    <div class="m-bank">${lines([
+      c.bankName ? `<b>ธนาคาร</b>${esc(c.bankName)}` : "",
+      c.bankAccountName ? `<b>ชื่อบัญชี</b>${esc(c.bankAccountName)}` : "",
+      `<b>เลขที่บัญชี</b>${esc(c.bankAccountNo)}`
+    ])}</div>` : "";
+  const sumRow = (th, en, v, cls) => `<tr class="${cls||""}"><th>${th}<small>${en}</small></th><td>${v}</td></tr>`;
+  const totals = isPrice ? "" : `<div class="m-totals"><table>
+      ${sumRow("รวมเป็นเงิน", "Subtotal", money(t.sub))}
+      ${q.vatMode === "add" ? sumRow("ภาษีมูลค่าเพิ่ม", `VAT ${t.rate}%`, money(t.vat)) : ""}
+      ${sumRow("ยอดเงินสุทธิ", "Grand Total", money(t.total), "grand")}
+    </table>
+    <div class="m-words">( ${esc(bahtText(t.total))} )</div></div>`;
+
+  const sign = (name, title, role, roleEn) => `<div class="m-sign">
+      <div class="m-sign-line"></div>
+      <div class="m-sign-name">( ${name ? esc(name) : "……………………………………………"} )</div>
+      ${title ? `<div>${esc(title)}</div>` : ""}
+      <div>${role} <small>(${roleEn})</small></div>
+      <div class="m-sign-date">วันที่ (Date) ……/……/……</div>
+    </div>`;
+
+  return `<div class="a4 modern">
+    <header class="m-head">
+      ${company}
+      <div class="m-title">
+        <div class="m-title-th">ใบเสนอราคา</div>
+        <div class="m-title-en">QUOTATION</div>
+        <table class="m-meta">${meta}</table>
+      </div>
+    </header>
+    <section class="m-cust">
+      <div class="m-cust-h">เสนอให้ <small>(Prepared For)</small></div>
+      <div class="m-cust-b">
+        <div>
+          <div class="m-cust-name">${esc(custName)}</div>
+          ${attnLine ? `<div class="m-pre">เรียน ${esc(attnLine)}</div>` : ""}
+          ${q.addr ? `<div class="m-pre">${esc(q.addr)}</div>` : ""}
+        </div>
+        <div>${contact}</div>
+      </div>
+    </section>
+    ${q.subject ? `<div class="m-subject"><b>เรื่อง</b> ${esc(q.subject)}</div>` : ""}
+    ${q.intro ? `<p class="m-intro">${esc(q.intro)}</p>` : ""}
+    <table class="m-items"><thead>${thead}</thead><tbody>${rows}</tbody></table>
+    <section class="m-summary${isPrice ? " full" : ""}">
+      <div class="m-left">${termsHtml}${bank}</div>
+      ${totals}
+    </section>
+    <section class="m-signs">
+      ${sign(q.signerName || c.signerName, q.signerTitle || c.signerTitle, "ผู้เสนอราคา", "Authorized Signature")}
+      ${sign("", "", "ผู้อนุมัติสั่งซื้อ", "Accepted By")}
+    </section>
   </div>`;
 }
 
@@ -1138,6 +1348,7 @@ function blankDoc(){
   const c = Store.config; const no = nextDocNo(todayISO());
   return {
     id: null, no, autoNo: no, dateISO: todayISO(),
+    layout: "modern", validDays: c.validDays ?? null, custEmail: "", custTaxId: "",
     subject: "ขอเสนอราคาทรายคัดขนาดพิเศษ", attn: "", addr: "", phone: "",
     customerId: "", customerName: "", intro: c.defaultIntro, formType: "full",
     items: [{name:"", qty:1, unit:"ตัน", price:0}],
@@ -1195,6 +1406,9 @@ function duplicate(d){
   delete cur.source; delete cur.amounts; delete cur.createdAt; delete cur.updatedAt;
   cur.signerName = Store.config.signerName; cur.signerTitle = Store.config.signerTitle;
   cur.copiedFrom = src;
+  // สำเนาของใบย้อนหลังคือใบเสนอราคาใหม่ จึงใช้แบบใหม่ และยืนราคาตามค่าตั้งต้นถ้าใบเดิมไม่มี
+  cur.layout = "modern";
+  if (cur.validDays == null) cur.validDays = Store.config.validDays ?? null;
   cur.no = cur.autoNo = nextDocNo(cur.dateISO);
   fillEditor(); go("editor");
   toast("สำเนาจาก " + src.no + " (" + thaiDate(src.dateISO) + ") — ราคายังเป็นของใบเดิม ตรวจก่อนบันทึก");
@@ -1204,6 +1418,8 @@ function fillEditor(){
   $("e_no").value = cur.no||""; $("e_date").value = cur.dateISO||"";
   $("e_status").value = cur.status||"draft"; $("e_subject").value = cur.subject||"";
   $("e_attn").value = cur.attn||""; $("e_addr").value = cur.addr||"";
+  $("e_valid").value = cur.validDays ?? ""; $("e_phone").value = cur.phone||"";
+  $("e_email").value = cur.custEmail||""; $("e_taxId").value = cur.custTaxId||"";
   $("e_intro").value = cur.intro||""; $("e_vat").value = cur.vatMode||"add";
   $("e_signer").value = cur.signerName||Store.config.signerName;
   $("e_signerTitle").value = cur.signerTitle||Store.config.signerTitle;
@@ -1218,13 +1434,16 @@ function readEditor(){
   cur.no = $("e_no").value.trim(); cur.dateISO = $("e_date").value;
   cur.status = $("e_status").value; cur.subject = $("e_subject").value;
   cur.attn = $("e_attn").value; cur.addr = $("e_addr").value;
+  cur.phone = $("e_phone").value; cur.custEmail = $("e_email").value.trim(); cur.custTaxId = $("e_taxId").value.trim();
+  const vd = $("e_valid").value.trim();
+  cur.validDays = vd === "" ? null : Math.max(0, parseInt(vd, 10) || 0);
   cur.intro = $("e_intro").value; cur.vatMode = $("e_vat").value;
   cur.signerName = $("e_signer").value; cur.signerTitle = $("e_signerTitle").value;
   cur.note = $("e_note").value;
   const c = Store.customers.find(x => x.id === $("e_cust").value);
   cur.customerId = c ? c.id : ""; cur.customerName = c ? c.name : (cur.customerName||"");
 }
-["e_no","e_date","e_status","e_subject","e_attn","e_addr","e_intro","e_vat","e_signer","e_signerTitle","e_note"]
+["e_no","e_date","e_status","e_subject","e_valid","e_attn","e_addr","e_phone","e_email","e_taxId","e_intro","e_vat","e_signer","e_signerTitle","e_note"]
   .forEach(id => $(id).addEventListener("input", () => { readEditor(); renderPreview(); }));
 
 $("e_gen").onclick = () => { $("e_no").value = nextDocNo($("e_date").value); readEditor(); cur.autoNo = cur.no; renderPreview(); };
@@ -1328,7 +1547,8 @@ function fillCustomerPick(){
     const c = Store.customers.find(x => x.id === sel.value);
     if (c){ cur.customerId = c.id; cur.customerName = c.name;
       $("e_attn").value = c.attn ? (c.attn + " " + c.name) : c.name;
-      $("e_addr").value = c.addr || ""; cur.phone = c.phone || ""; }
+      $("e_addr").value = c.addr || ""; $("e_phone").value = c.phone || "";
+      $("e_email").value = c.email || ""; $("e_taxId").value = c.tax || ""; }
     readEditor(); renderPreview();
   };
 }
@@ -1340,7 +1560,7 @@ $("e_saveCust").onclick = async () => {
   readEditor();
   const name = (cur.customerName || cur.attn || "").trim();
   if (!name) return toast("กรอกชื่อ/ผู้รับก่อน");
-  const id = await Store.put("customers", {name, attn:"", addr:cur.addr, phone:cur.phone||"", tax:""});
+  const id = await Store.put("customers", {name, attn:"", addr:cur.addr, phone:cur.phone||"", tax:cur.custTaxId||"", email:cur.custEmail||""});
   cur.customerId = id; cur.customerName = name; toast("เพิ่มลูกค้าแล้ว"); fillCustomerPick();
 };
 
@@ -1439,7 +1659,8 @@ function renderMaster(){
       <td class="r" style="white-space:nowrap"><button class="btn btn-ghost btn-sm" data-a="e">แก้ไข</button><button class="btn btn-danger btn-sm" data-a="d">ลบ</button></td>`;
     tr.querySelector('[data-a="e"]').onclick = () => {
       $("c_name").value = c.name||""; $("c_attn").value = c.attn||""; $("c_addr").value = c.addr||"";
-      $("c_phone").value = c.phone||""; $("c_tax").value = c.tax||""; $("c_add").dataset.id = c.id;
+      $("c_phone").value = c.phone||""; $("c_tax").value = c.tax||""; $("c_email").value = c.email||"";
+      $("c_add").dataset.id = c.id;
     };
     tr.querySelector('[data-a="d"]').onclick = async () => { if(confirm("ลบลูกค้า "+c.name+"?")) { await Store.remove("customers", c.id); renderMaster(); } };
     cb.appendChild(tr);
@@ -1459,10 +1680,10 @@ function renderMaster(){
 }
 $("c_add").onclick = async () => {
   const name = $("c_name").value.trim(); if (!name) return toast("กรอกชื่อลูกค้า");
-  await Store.put("customers", {id:$("c_add").dataset.id||null, name, attn:$("c_attn").value, addr:$("c_addr").value, phone:$("c_phone").value, tax:$("c_tax").value});
+  await Store.put("customers", {id:$("c_add").dataset.id||null, name, attn:$("c_attn").value, addr:$("c_addr").value, phone:$("c_phone").value, tax:$("c_tax").value, email:$("c_email").value.trim()});
   $("c_clear").click(); toast("บันทึกลูกค้าแล้ว"); renderMaster();
 };
-$("c_clear").onclick = () => { ["c_name","c_attn","c_addr","c_phone","c_tax"].forEach(i=>$(i).value=""); delete $("c_add").dataset.id; };
+$("c_clear").onclick = () => { ["c_name","c_attn","c_addr","c_phone","c_tax","c_email"].forEach(i=>$(i).value=""); delete $("c_add").dataset.id; };
 $("p_add").onclick = async () => {
   const name = $("p_name").value.trim(); if (!name) return toast("กรอกชื่อสินค้า");
   await Store.put("products", {id:$("p_add").dataset.id||null, name, nameKey:nkey(name), unit:$("p_unit").value||"ตัน", price:Number($("p_price").value)||0});
@@ -1480,6 +1701,8 @@ function fillSettings(){
   $("s_showTax").checked = !!c.showTaxId; $("s_signer").value = c.signerName||"";
   $("s_signerTitle").value = c.signerTitle||""; $("s_vat").value = c.vatRate;
   $("s_pattern").value = c.docNoPattern||""; $("s_intro").value = c.defaultIntro||"";
+  $("s_valid").value = c.validDays ?? ""; $("s_bank").value = c.bankName||"";
+  $("s_bankName").value = c.bankAccountName||""; $("s_bankNo").value = c.bankAccountNo||"";
   const host = $("s_terms"); host.innerHTML = "";
   c.defaultTerms.forEach((t,i) => host.appendChild(termRow(t, () => { c.defaultTerms.splice(i,1); fillSettings(); }, () => {})));
 }
@@ -1492,6 +1715,8 @@ $("s_save").onclick = async () => {
   c.showLetterhead = $("s_lh").checked; c.showLogo = $("s_logo").checked; c.showTaxId = $("s_showTax").checked;
   c.signerName = $("s_signer").value; c.signerTitle = $("s_signerTitle").value;
   c.vatRate = Number($("s_vat").value)||7; c.docNoPattern = $("s_pattern").value; c.defaultIntro = $("s_intro").value;
+  const vd = $("s_valid").value.trim(); c.validDays = vd === "" ? null : Math.max(0, parseInt(vd, 10) || 0);
+  c.bankName = $("s_bank").value.trim(); c.bankAccountName = $("s_bankName").value.trim(); c.bankAccountNo = $("s_bankNo").value.trim();
   await Store.saveConfig(); toast("บันทึกการตั้งค่าแล้ว"); renderRegistry();
 };
 
@@ -1970,9 +2195,21 @@ function wCell(w, content, o){
   o = o || {};
   const bd = o.noBorder ? "" : `<w:tcBorders><w:top w:val="single" w:sz="6" w:color="000000"/><w:left w:val="single" w:sz="6" w:color="000000"/><w:bottom w:val="single" w:sz="6" w:color="000000"/><w:right w:val="single" w:sz="6" w:color="000000"/></w:tcBorders>`;
   const shd = o.shade ? `<w:shd w:val="clear" w:color="auto" w:fill="${o.shade}"/>` : "";
-  return `<w:tc><w:tcPr><w:tcW w:w="${w}" w:type="dxa"/>${bd}${shd}<w:vAlign w:val="center"/></w:tcPr>${wP(content, {align:o.align, b:o.b})}</w:tc>`;
+  return `<w:tc><w:tcPr><w:tcW w:w="${w}" w:type="dxa"/>${bd}${shd}<w:vAlign w:val="center"/></w:tcPr>${wP(content, {align:o.align, b:o.b, sz:o.sz, color:o.color})}</w:tc>`;
+}
+/** ช่องตารางที่ใส่ XML ดิบได้หลายย่อหน้าหรือตารางซ้อน · Word บังคับให้ทุกช่องปิดท้ายด้วยย่อหน้า */
+function wCellXml(w, xml, o){
+  o = o || {};
+  const shd = o.shade ? `<w:shd w:val="clear" w:color="auto" w:fill="${o.shade}"/>` : "";
+  const mar = o.pad ? `<w:tcMar><w:top w:w="${o.pad}" w:type="dxa"/><w:left w:w="${o.pad}" w:type="dxa"/>`
+    + `<w:bottom w:w="${o.pad}" w:type="dxa"/><w:right w:w="${o.pad}" w:type="dxa"/></w:tcMar>` : "";
+  const body = /<\/w:p>\s*$/.test(xml) ? xml : xml + "<w:p/>";
+  return `<w:tc><w:tcPr><w:tcW w:w="${w}" w:type="dxa"/>${o.borders||""}${shd}${mar}<w:vAlign w:val="${o.valign||"top"}"/></w:tcPr>${body}</w:tc>`;
 }
 function buildDocXml(q){
+  return q.layout === "modern" ? buildDocXmlModern(q) : buildDocXmlLetter(q);
+}
+function buildDocXmlLetter(q){
   const c = Store.config, t = calc(q), items = q.items||[];
   let body = "";
   if (c.showLetterhead){
@@ -2067,6 +2304,134 @@ function buildDocXml(q){
   return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><w:body>${body}
 <w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1418" w:header="709" w:footer="709" w:gutter="0"/></w:sectPr></w:body></w:document>`;
+}
+/* ไฟล์ Word แบบใบเสนอราคาเชิงพาณิชย์ — ลำดับส่วนเดียวกับ renderDocModern */
+function buildDocXmlModern(q){
+  const c = Store.config, t = calc(q);
+  const items = (q.items||[]).filter(it => String(it.name||"").trim());
+  const isPrice = q.formType === "price";
+  const unit = items.map(i => i.unit).filter(Boolean)[0] || "ตัน";
+  const W = 9350, GREY = "F9FAFB", DARK = "374151", LINE = "E5E7EB", MUTED = "4B5563";
+  const tbl = (widths, rows, o) => `<w:tbl><w:tblPr><w:tblW w:w="${widths.reduce((a, b) => a + b, 0)}" w:type="dxa"/>`
+    + `${o && o.right ? `<w:jc w:val="right"/>` : ""}<w:tblLayout w:type="fixed"/></w:tblPr>`
+    + `<w:tblGrid>${widths.map(x => `<w:gridCol w:w="${x}"/>`).join("")}</w:tblGrid>${rows}</w:tbl>`;
+  const bottom = (sz, color) => `<w:tcBorders><w:bottom w:val="single" w:sz="${sz}" w:color="${color}"/></w:tcBorders>`;
+  const box = (color) => `<w:tcBorders>${["top","left","bottom","right"].map(s => `<w:${s} w:val="single" w:sz="4" w:color="${color}"/>`).join("")}</w:tcBorders>`;
+  const para = (runs, after) => `<w:p><w:pPr><w:spacing w:before="0" w:after="${after||0}"/></w:pPr>${runs}</w:p>`;
+  let body = "";
+
+  // หัว: บริษัทซ้าย ชื่อเอกสารและเลขที่ขวา
+  const hasLogo = c.showLetterhead && c.showLogo !== false;
+  const logo = `<w:p><w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0">
+    <wp:extent cx="756000" cy="517500"/><wp:docPr id="1" name="logo"/>
+    <a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">
+      <pic:pic><pic:nvPicPr><pic:cNvPr id="1" name="logo.png"/><pic:cNvPicPr/></pic:nvPicPr>
+      <pic:blipFill><a:blip r:embed="rId2"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>
+      <pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="756000" cy="517500"/></a:xfrm>
+      <a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr>
+    </pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>`;
+  const company = c.showLetterhead
+    ? wP(c.companyName, {b:true, sz:36})
+      + (c.companyNameEn ? wP(c.companyNameEn, {b:true, sz:22, color:"6B7280", spacing:"16"}) : "")
+      + [c.companyAddr, [c.phone ? "โทร. " + c.phone : "", c.website].filter(Boolean).join(" · "),
+         (c.showTaxId && c.taxId) ? "เลขประจำตัวผู้เสียภาษี " + c.taxId : ""]
+        .filter(Boolean).map(s => wP(s, {sz:22, color:MUTED})).join("")
+    : wP("");
+  const meta = [["เลขที่ (No.)", q.no], ["วันที่ (Date)", thaiDate(q.dateISO)]]
+    .concat(q.validDays != null && q.validDays !== "" ? [["ยืนราคา (Valid)", q.validDays + " วัน"]] : []);
+  const title = wP("ใบเสนอราคา", {b:true, sz:48, align:"right"})
+    + wP("QUOTATION", {b:true, sz:28, color:"6B7280", spacing:"40", align:"right", after:80})
+    + tbl([1450, 1750], meta.map(([k, v]) => `<w:tr>${wCellXml(1450, wP(k, {b:true, sz:24, color:DARK}))}${wCellXml(1750, wP(v, {sz:24}))}</w:tr>`).join(""), {right:true});
+  const hw = hasLogo ? [1400, 4550, 3400] : [5950, 3400];
+  body += tbl(hw, `<w:tr>${hasLogo ? wCellXml(hw[0], logo) : ""}${wCellXml(hw[hw.length-2], company)}${wCellXml(hw[hw.length-1], title)}</w:tr>`);
+  body += `<w:p><w:pPr><w:pBdr><w:bottom w:val="single" w:sz="12" w:color="9CA3AF"/></w:pBdr><w:spacing w:before="0" w:after="200"/></w:pPr></w:p>`;
+
+  // กล่องลูกค้า
+  const custName = q.customerName || String(q.attn||"").split("\n")[0];
+  const attnLine = q.attn && q.attn !== custName ? q.attn : "";
+  const custLeft = wP(custName, {b:true, sz:30})
+    + (attnLine ? wP("เรียน " + attnLine, {sz:24, color:MUTED}) : "")
+    + (q.addr ? wP(q.addr, {sz:24, color:MUTED}) : "");
+  const custRight = [q.phone ? "โทร. " + q.phone : "", q.custEmail ? "อีเมล " + q.custEmail : "",
+    q.custTaxId ? "เลขประจำตัวผู้เสียภาษี " + q.custTaxId : ""].filter(Boolean).map(s => wP(s, {sz:24, color:MUTED})).join("") || wP("");
+  const cw = [5200, 3910];
+  body += tbl([W], `<w:tr>${wCellXml(W,
+    wP("เสนอให้ (Prepared For)", {b:true, sz:26, after:60})
+    + tbl(cw, `<w:tr>${wCellXml(cw[0], custLeft)}${wCellXml(cw[1], custRight)}</w:tr>`),
+    {shade:GREY, borders:box("F3F4F6"), pad:120})}</w:tr>`);
+  body += wP("", {after:120});
+
+  if (q.subject) body += para(wRun("เรื่อง  ", {b:true}) + wRun(q.subject), 60);
+  if (q.intro) body += wP(q.intro, {indent:720, after:160});
+
+  // ตารางสินค้า: หัวพื้นเข้มตัวขาว พิมพ์หัวซ้ำทุกหน้าถ้ารายการยาว
+  const headCell = (w, th, en, align) => wCellXml(w, wP(th, {b:true, sz:24, color:"FFFFFF", align}) + wP(en, {sz:18, color:"FFFFFF", align}),
+    {shade:DARK, pad:60, valign:"bottom"});
+  const cell = (w, text, align, shade) => wCellXml(w, wP(text, {sz:26, align}), {shade, pad:60, borders:bottom(4, LINE)});
+  const headRow = (cells) => `<w:tr><w:trPr><w:tblHeader/></w:trPr>${cells}</w:tr>`;
+  if (isPrice){
+    const g = [900, 5550, 1100, 1800];
+    body += tbl(g, headRow(headCell(g[0], "ลำดับ", "Item", "center") + headCell(g[1], "รายการสินค้า", "Description")
+        + headCell(g[2], "หน่วย", "Unit", "center") + headCell(g[3], "ราคา/หน่วย", "Unit Price", "right"))
+      + items.map((it, i) => { const s = i % 2 ? GREY : "";
+        return `<w:tr>${cell(g[0], String(i+1), "center", s)}${cell(g[1], it.name, undefined, s)}${cell(g[2], it.unit || unit, "center", s)}${cell(g[3], money(it.price), "right", s)}</w:tr>`; }).join(""));
+  } else {
+    const g = [800, 4050, 1400, 1450, 1650];
+    body += tbl(g, headRow(headCell(g[0], "ลำดับ", "Item", "center") + headCell(g[1], "รายการสินค้า", "Description")
+        + headCell(g[2], "จำนวน (" + unit + ")", "Qty", "center") + headCell(g[3], "ราคา/หน่วย", "Unit Price", "right")
+        + headCell(g[4], "จำนวนเงิน", "Amount", "right"))
+      + items.map((it, i) => { const s = i % 2 ? GREY : "";
+        return `<w:tr>${cell(g[0], String(i+1), "center", s)}${cell(g[1], it.name, undefined, s)}${cell(g[2], qty(it.qty), "center", s)}`
+          + `${cell(g[3], money(it.price), "right", s)}${cell(g[4], money((Number(it.qty)||0)*(Number(it.price)||0)), "right", s)}</w:tr>`; }).join(""));
+  }
+  body += wP("", {after:160});
+
+  // สรุป: เงื่อนไขและบัญชีธนาคารซ้าย ยอดเงินขวา
+  const leftW = isPrice ? W : 5250;
+  const terms = (q.vatMode === "exclude" ? [{label:"ภาษีมูลค่าเพิ่ม", value:"ราคานี้ไม่รวมภาษีมูลค่าเพิ่ม (VAT " + t.rate + "%)"}] : [])
+    .concat((q.terms||[]).filter(x => (x.label||"").trim() || (x.value||"").trim()));
+  let left = "";
+  if (terms.length){
+    left += wP("เงื่อนไขการเสนอราคา (Terms & Conditions)", {b:true, sz:26, after:60});
+    left += terms.map(x => para(wRun((x.label||"") + "  ", {b:true, sz:24}) + wRun(x.value, {sz:24, color:MUTED}), 40)).join("");
+  }
+  if (c.bankAccountNo){
+    const bankRows = [["ธนาคาร", c.bankName], ["ชื่อบัญชี", c.bankAccountName], ["เลขที่บัญชี", c.bankAccountNo]].filter(r => r[1]);
+    left += wP("รายละเอียดบัญชี (Bank Details)", {b:true, sz:26, before:120, after:60});
+    left += tbl([leftW - 100], `<w:tr>${wCellXml(leftW - 100,
+      bankRows.map(([k, v]) => para(wRun(k + "  ", {b:true, sz:24}) + wRun(v, {sz:24}))).join(""),
+      {shade:GREY, borders:box(LINE), pad:100})}</w:tr>`);
+  }
+  if (isPrice){
+    body += tbl([W], `<w:tr>${wCellXml(W, left || wP(""))}</w:tr>`);
+  } else {
+    const tw = [2450, 1550];
+    const sumRow = (th, en, v, grand) => {
+      const o = {shade: grand ? "F3F4F6" : "", borders: bottom(grand ? 18 : 4, grand ? MUTED : LINE), pad:60};
+      return `<w:tr>${wCellXml(tw[0], wP(th, {b:true, sz: grand ? 28 : 24, align:"right"}) + wP(en, {sz:18, color:"6B7280", align:"right"}), o)}`
+        + `${wCellXml(tw[1], wP(v, {b:!!grand, sz: grand ? 30 : 24, align:"right"}), Object.assign({}, o, {valign:"center"}))}</w:tr>`;
+    };
+    const right = tbl(tw, sumRow("รวมเป็นเงิน", "Subtotal", money(t.sub))
+        + (q.vatMode === "add" ? sumRow("ภาษีมูลค่าเพิ่ม", "VAT " + t.rate + "%", money(t.vat)) : "")
+        + sumRow("ยอดเงินสุทธิ", "Grand Total", money(t.total), true))
+      + wP("( " + bahtText(t.total) + " )", {sz:22, color:"6B7280", align:"center", before:60});
+    body += tbl([leftW, W - leftW], `<w:tr>${wCellXml(leftW, left || wP(""))}${wCellXml(W - leftW, right)}</w:tr>`);
+  }
+  body += wP("", {after:360});
+
+  // ลายเซ็นสองฝั่ง
+  const sign = (name, titleText, role) => wP("", {after:900})
+    + `<w:p><w:pPr><w:pBdr><w:bottom w:val="single" w:sz="6" w:color="9CA3AF"/></w:pBdr><w:spacing w:before="0" w:after="60"/><w:ind w:left="500" w:right="500"/></w:pPr></w:p>`
+    + wP("( " + (name || "……………………………………………") + " )", {b:true, sz:24, align:"center"})
+    + (titleText ? wP(titleText, {sz:24, align:"center"}) : "")
+    + wP(role, {sz:24, color:MUTED, align:"center"})
+    + wP("วันที่ (Date) ……/……/……", {sz:22, color:"6B7280", align:"center"});
+  body += tbl([W/2, W/2], `<w:tr>${wCellXml(W/2, sign(q.signerName || c.signerName, q.signerTitle || c.signerTitle, "ผู้เสนอราคา (Authorized Signature)"))}`
+    + `${wCellXml(W/2, sign("", "", "ผู้อนุมัติสั่งซื้อ (Accepted By)"))}</w:tr>`);
+  body += wP("");
+
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><w:body>${body}<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1418" w:header="709" w:footer="709" w:gutter="0"/></w:sectPr></w:body></w:document>`;
 }
 async function exportDocx(q){
   if (typeof JSZip === "undefined") return toast("โมดูลสร้างไฟล์ Word ยังไม่พร้อม — ใช้ปุ่มพิมพ์/PDF แทนได้");

@@ -98,6 +98,18 @@ CREATE TABLE IF NOT EXISTS company_config (
   data  JSONB NOT NULL
 );
 
+-- ---------- คอลัมน์ที่เพิ่มภายหลัง ----------
+-- ฐานข้อมูลที่สร้างไว้ก่อนแล้วจะได้คอลัมน์เหล่านี้ตอนแอปสตาร์ท
+-- layout: letter = หนังสือทางการแบบเดิม, modern = ใบเสนอราคาเชิงพาณิชย์
+-- ใบที่มีอยู่ก่อนได้ letter ทั้งหมด พิมพ์ซ้ำจึงได้หน้าตาเดียวกับที่ส่งลูกค้าไปแล้ว
+ALTER TABLE quotations ADD COLUMN IF NOT EXISTS layout      TEXT NOT NULL DEFAULT 'letter'
+  CHECK (layout IN ('letter','modern'));
+ALTER TABLE quotations ADD COLUMN IF NOT EXISTS valid_days  INT CHECK (valid_days IS NULL OR valid_days >= 0);
+-- อีเมลและเลขผู้เสียภาษีของลูกค้า ณ วันออกเอกสาร เก็บแยกจากทะเบียนเหมือน addr / phone
+ALTER TABLE quotations ADD COLUMN IF NOT EXISTS cust_email  TEXT NOT NULL DEFAULT '';
+ALTER TABLE quotations ADD COLUMN IF NOT EXISTS cust_tax_id TEXT NOT NULL DEFAULT '';
+ALTER TABLE customers  ADD COLUMN IF NOT EXISTS email       TEXT NOT NULL DEFAULT '';
+
 -- ---------- ดัชนี ----------
 CREATE UNIQUE INDEX IF NOT EXISTS idx_quo_dedupe ON quotations (dedupe_key);
 CREATE INDEX IF NOT EXISTS idx_quo_no        ON quotations (no);
