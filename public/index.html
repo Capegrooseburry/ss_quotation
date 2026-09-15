@@ -110,7 +110,15 @@ button,input,select,textarea{font:inherit;color:inherit}
 .tab[aria-current="page"]{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent);font-weight:600}
 .topbar-right{display:flex;align-items:center;gap:10px}
 main{flex:1;padding-inline:20px;padding-block:22px 56px;max-width:1400px;width:100%;margin:0 auto}
-@media (max-width:760px){ .topbar{padding-left:16px;padding-right:16px} main{padding-inline:16px} .tabs{margin-inline-start:0;order:3;width:100%} }
+/* iPad และจอแคบกว่า: แท็บลงไปอยู่แถวที่สองเต็มความกว้าง เลื่อนซ้ายขวาได้แทนการตัดหลายบรรทัด */
+@media (max-width:1100px){
+  .tabs{margin-inline-start:0;order:3;width:100%;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{flex:none}
+  .topbar-right{margin-inline-start:auto}
+}
+@media (max-width:760px){ .topbar{padding-left:16px;padding-right:16px;gap:10px 12px} main{padding-inline:16px;padding-block:16px 48px} }
+@media (max-width:480px){ .brand > div{display:none} }
 
 .badge{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;
   padding:4px 7px;border-radius:5px;border:1px solid var(--line-strong);color:var(--ink-3);white-space:nowrap}
@@ -136,7 +144,7 @@ main{flex:1;padding-inline:20px;padding-block:22px 56px;max-width:1400px;width:1
 
 label.f{display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:var(--ink-2);min-width:0}
 label.f > span{font-weight:500}
-input[type=text],input[type=date],input[type=number],input[type=search],select,textarea{
+input[type=text],input[type=date],input[type=number],input[type=search],input[type=email],input[type=password],select,textarea{
   width:100%;background:var(--ground);border:1px solid var(--line);border-radius:7px;padding:7px 9px;font-size:13.5px;color:var(--ink)}
 input:hover,select:hover,textarea:hover{border-color:var(--line-strong)}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
@@ -146,7 +154,12 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
 .g2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .g3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .g4{grid-template-columns:repeat(4,minmax(0,1fr))}
-@media (max-width:820px){.g2,.g3,.g4{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:820px){.g3,.g4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.g2,.g3,.g4{grid-template-columns:minmax(0,1fr)}}
+/* กล่องสองใบวางคู่กัน (ลูกค้า/สินค้า, นำเข้า/ส่งออก) — iPad แนวตั้งลงมาเรียงทีละกล่อง */
+@media (max-width:1000px){.grid.panels{grid-template-columns:minmax(0,1fr)}}
+/* แถวฟอร์มที่วางช่องเรียงกัน บนมือถือให้แต่ละช่องเต็มบรรทัด */
+@media (max-width:560px){.inline > label.f{flex:1 1 100%!important;width:auto!important;min-width:0!important}}
 
 /* ---------- registry ---------- */
 .stat-row{display:grid;gap:12px;grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:16px}
@@ -154,6 +167,7 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
 .stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:13px 15px;display:flex;flex-direction:column;gap:3px}
 .stat b{font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-size:22px;font-weight:500;letter-spacing:-.02em;line-height:1.15}
 .stat .unit{font-size:12px;color:var(--ink-3);font-family:var(--font-ui)}
+@media (max-width:480px){.stat-row{gap:8px}.stat{padding:10px 12px}.stat b{font-size:18px;overflow-wrap:anywhere}}
 
 .filters{display:grid;gap:10px;grid-template-columns:minmax(180px,2fr) repeat(4,minmax(0,1fr)) auto;align-items:end}
 @media (max-width:1000px){.filters{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -195,13 +209,55 @@ table.mini tr:last-child td{border-bottom:none}
 .pricehint b{font-family:var(--font-mono);color:var(--accent);font-weight:500}
 .empty{padding:38px 20px;text-align:center;color:var(--ink-3)}
 
+/* iPad: ตารางทะเบียน/ประวัติบีบให้พอดีจอ ปุ่มในแถวเรียง 2×2 */
+@media (max-width:1000px){ #regTable,#h_table{min-width:0} .rowacts{display:grid;grid-template-columns:repeat(2,auto)} }
+@media (min-width:701px) and (max-width:1000px){ #regTable .c-items .sub{display:none} #regTable .c-no{white-space:nowrap} }
+/* มือถือ: แต่ละแถวของตารางกลายเป็นการ์ด */
+@media (max-width:700px){
+  #regTable thead,#h_table thead{display:none}
+  #regTable,#regTable tbody,#h_table,#h_table tbody{display:block}
+  #regTable tbody tr:hover,#h_table tbody tr:hover{background:none}
+
+  #regTable tbody tr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;padding:12px 16px;border-bottom:1px solid var(--line);
+    grid-template-areas:"no status" "date val" "cust cust" "items items" "acts acts"}
+  #regTable tbody tr:last-child{border-bottom:none}
+  #regTable td{display:block;padding:0;border:none}
+  #regTable .c-no{grid-area:no;align-self:center}
+  #regTable .c-status{grid-area:status;text-align:right}
+  #regTable .c-date{grid-area:date;font-size:12.5px;color:var(--ink-3)}
+  #regTable .c-val{grid-area:val;font-weight:600}
+  #regTable .c-cust{grid-area:cust;margin-top:4px}
+  #regTable .c-items{grid-area:items;font-size:12.5px;color:var(--ink-2)}
+  #regTable .c-items > div{display:inline}
+  #regTable .c-items .sub:not(:empty)::before{content:" · "}
+  #regTable .c-acts{grid-area:acts;margin-top:8px}
+  #regTable .rowacts{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-start}
+  #regTable .rowacts .btn{flex:1 1 0;border-color:var(--line)}
+
+  #h_table tbody tr.hrow{position:relative;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px 14px;
+    padding:12px 16px 12px 32px;border-bottom:1px solid var(--line)}
+  #h_table tr.hrow td{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:0;border:none;text-align:right}
+  #h_table tr.hrow td[data-label]::before{content:attr(data-label);font-size:12px;color:var(--ink-3);text-align:left;font-family:var(--font-ui);font-weight:400}
+  #h_table tr.hrow td:first-child{grid-column:1/-1;position:static;padding-left:0;text-align:left;margin-bottom:2px}
+  #h_table tr.hrow td:first-child::before{left:13px;top:12px}
+  #h_table tr.hrow .c-delta{grid-column:1/-1}
+  #h_table tr.hdetail{display:block}
+  #h_table tr.hdetail > td{display:block;padding:0 12px 12px}
+  #h_table tr.hdetail table.mini{min-width:560px}
+}
+
 /* ---------- editor ---------- */
 .editor{display:grid;gap:16px;grid-template-columns:minmax(0,1.02fr) minmax(0,.98fr);align-items:start}
-@media (max-width:1120px){.editor{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:1180px){.editor{grid-template-columns:minmax(0,1fr)}}
 .pv-col{position:sticky;top:76px}
-@media (max-width:1120px){.pv-col{position:static}}
+@media (max-width:1180px){.pv-col{position:static}}
 .pv-scroll{overflow:auto;max-height:calc(100vh - 150px);background:var(--surface-2);border-radius:0 0 var(--r) var(--r);padding:14px}
-@media (max-width:1120px){.pv-scroll{max-height:none}}
+@media (max-width:1180px){.pv-scroll{max-height:none}}
+@media (max-width:560px){
+  .inline.ed-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ed-actions #e_save{grid-column:1/-1}
+  .ed-actions #e_del{margin-inline-start:0!important}
+}
 
 table.items{width:100%;border-collapse:collapse;font-size:13px}
 table.items th{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:500;
@@ -209,8 +265,34 @@ table.items th{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;co
 table.items td{padding:3px 6px 3px 0;vertical-align:top}
 table.items td:last-child{padding-right:0}
 .it-idx{font-family:var(--font-mono);color:var(--ink-3);font-size:12px;padding-top:13px;width:22px}
+table.items td.it-amt{padding-top:13px}
+table.items td.it-del{padding-top:9px}
+/* มือถือ: รายการสินค้าแต่ละบรรทัดเป็นการ์ด ชื่อเต็มบรรทัด ตัวเลขเรียงสองคอลัมน์พร้อมป้ายกำกับ */
+@media (max-width:620px){
+  table.items thead{display:none}
+  table.items,table.items tbody{display:block}
+  table.items tr.it-row{display:grid;grid-template-columns:22px minmax(0,1fr) minmax(0,1fr) auto;gap:6px 8px;
+    grid-template-areas:"idx name name del" ". qty unit unit" ". price amt amt";
+    padding-top:12px;margin-top:12px;border-top:1px solid var(--line)}
+  table.items tr.it-row:first-child{padding-top:0;margin-top:0;border-top:none}
+  table.items.price tr.it-row{grid-template-areas:"idx name name del" ". unit price price"}
+  table.items tr.it-row td{display:block;padding:0}
+  table.items tr.it-row td.it-idx{grid-area:idx;padding-top:9px}
+  table.items .it-name{grid-area:name} table.items .it-qty{grid-area:qty} table.items .it-unit{grid-area:unit}
+  table.items .it-price{grid-area:price} table.items .it-del{grid-area:del}
+  table.items tr.it-row td.it-amt{grid-area:amt;align-self:end;padding-bottom:8px}
+  table.items td[data-label]::before{content:attr(data-label);display:block;font-size:11px;color:var(--ink-3);margin-bottom:2px;font-family:var(--font-ui)}
+  table.items tr.it-hint{display:block}
+  table.items tr.it-hint > td{display:block;padding:0}
+  table.items tr.it-hint > td:first-child{display:none}
+}
 .terms-row{display:grid;grid-template-columns:minmax(120px,190px) minmax(0,1fr) auto;gap:8px;align-items:start;margin-bottom:8px}
-@media (max-width:620px){.terms-row{grid-template-columns:minmax(0,1fr)}}
+/* มือถือ: หัวข้อ + ปุ่มลบอยู่บรรทัดเดียวกัน รายละเอียดเต็มบรรทัดล่าง */
+@media (max-width:620px){
+  .terms-row{grid-template-columns:minmax(0,1fr) auto;gap:6px;padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid var(--line)}
+  .terms-row > textarea{grid-column:1/-1}
+  .terms-row > button{grid-row:1;grid-column:2}
+}
 .totals{margin-top:14px;margin-left:auto;max-width:330px;display:grid;grid-template-columns:1fr auto;gap:4px 16px;font-size:13.5px}
 .totals .lab{color:var(--ink-2)}
 .totals .grand{font-weight:700;font-size:16px;border-top:1px solid var(--line-strong);padding-top:6px;margin-top:4px}
@@ -311,12 +393,28 @@ table.items td:last-child{padding-right:0}
 .a4.modern .m-sign-name{font-weight:600;color:#1f2937}
 .a4.modern .m-cust-h small,.a4.modern .m-left h4 small,.a4.modern .m-sign small{display:inline;font-size:11px}
 .a4.modern .m-sign-date{color:#6b7280;margin-top:1mm}
-@media (max-width:1120px){.a4{box-shadow:none;margin:0}}
+@media (max-width:1180px){.a4{box-shadow:none;margin:0}}
 
 .overlay{position:fixed;inset:0;background:rgba(12,18,24,.72);z-index:60;overflow:auto;padding:0 0 40px}
 .overlay-bar{position:sticky;top:0;z-index:2;display:flex;gap:8px;align-items:center;flex-wrap:wrap;
   background:var(--surface);border-bottom:1px solid var(--line);padding:10px 16px}
+.overlay-bar .eyebrow{flex:1 1 120px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .overlay-body{padding:18px 12px}
+@media (max-width:560px){
+  .overlay-bar .inline{margin-inline-start:0!important;width:100%}
+  .overlay-bar .inline .btn{flex:1 1 0}
+  .overlay-body{padding:12px 8px}
+}
+
+/* จอสัมผัส (มือถือ/iPad): ปุ่มใหญ่พอให้นิ้วกด และช่องกรอก 16px กัน iOS ซูมหน้าเองตอนแตะ */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+@media (pointer:coarse){
+  input[type=text],input[type=date],input[type=number],input[type=search],input[type=email],input[type=password],select,textarea{font-size:16px;padding:9px 10px}
+  .btn{min-height:40px}
+  .btn-sm{min-height:36px}
+  .tab{padding:9px 14px}
+  .seg button{padding:9px 14px}
+}
 
 /* ---------- import / export ---------- */
 .drop{border:1.5px dashed var(--line-strong);border-radius:var(--r);padding:26px;text-align:center;color:var(--ink-2);background:var(--ground)}
@@ -332,6 +430,7 @@ table.items td:last-child{padding-right:0}
   .overlay{position:static;background:none;padding:0;overflow:visible}
   .overlay-body{padding:0}
   .a4{width:auto;min-height:0;box-shadow:none;padding:0;margin:0}
+  #pvFull,#pvHost{zoom:1!important}   /* ย่อไว้ให้พอดีจอ แต่ตอนพิมพ์ต้องเต็ม A4 */
   @page{size:A4;margin:16mm 15mm 14mm}
 }
 </style>
@@ -546,7 +645,7 @@ table.items td:last-child{padding-right:0}
             </div>
           </div>
 
-          <div class="inline">
+          <div class="inline ed-actions">
             <button class="btn btn-primary" id="e_save">บันทึกใบเสนอราคา</button>
             <button class="btn" id="e_print">ดูตัวอย่าง / พิมพ์</button>
             <button class="btn" id="e_docx">ดาวน์โหลด Word</button>
@@ -568,7 +667,7 @@ table.items td:last-child{padding-right:0}
 
     <!-- ============ MASTER ============ -->
     <section id="view-master" hidden>
-      <div class="grid g2" style="align-items:start">
+      <div class="grid g2 panels" style="align-items:start">
         <div class="panel">
           <div class="panel-h"><h2>ทะเบียนลูกค้า</h2><span class="hint" id="custCount" style="margin-inline-start:auto"></span></div>
           <div class="panel-b stack">
@@ -606,7 +705,7 @@ table.items td:last-child{padding-right:0}
 
     <!-- ============ IMPORT / EXPORT ============ -->
     <section id="view-io" hidden>
-      <div class="grid g2" style="align-items:start">
+      <div class="grid g2 panels" style="align-items:start">
         <div class="panel">
           <div class="panel-h"><h2>นำเข้าเอกสารย้อนหลัง</h2></div>
           <div class="panel-b stack">
@@ -1127,6 +1226,9 @@ function go(v){
   document.querySelectorAll("#tabs .tab").forEach(b => {
     if (b.dataset.view === v) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current");
   });
+  // แท็บบนจอแคบเลื่อนซ้ายขวาได้ — เลื่อนแท็บที่เลือกมาไว้กลางแถบ
+  const tabs = $("tabs"), on = tabs.querySelector(".tab[aria-current]");
+  if (on && tabs.scrollWidth > tabs.clientWidth) tabs.scrollLeft = on.offsetLeft - tabs.offsetLeft - (tabs.clientWidth - on.offsetWidth) / 2;
   if (v === "settings") fillSettings();
   if (v === "master") renderMaster();
   if (v === "history") renderHistory();
@@ -1173,13 +1275,13 @@ function renderRegistry(){
     const tr = el("tr");
     const val = d.formType === "price" ? `<span class="sub">ตารางราคา</span>` : `<span class="money">${money(docValue(d))}</span>`;
     tr.innerHTML = `
-      <td><span class="docno">${esc(d.no)}</span></td>
-      <td style="white-space:nowrap">${esc(thaiDate(d.dateISO))}</td>
-      <td><div class="cust">${esc(d.customerName || d.attn)}</div><div class="sub">${esc(d.subject)}</div></td>
-      <td><div>${(d.items||[]).length} รายการ</div><div class="sub">${esc(((d.items||[])[0]||{}).name || "")}</div></td>
-      <td class="r">${val}</td>
-      <td><span class="chip ${esc(d.status||"draft")}">${STATUS_LABEL[d.status]||"ร่าง"}</span></td>
-      <td><div class="rowacts">
+      <td class="c-no"><span class="docno">${esc(d.no)}</span></td>
+      <td class="c-date" style="white-space:nowrap">${esc(thaiDate(d.dateISO))}</td>
+      <td class="c-cust"><div class="cust">${esc(d.customerName || d.attn)}</div><div class="sub">${esc(d.subject)}</div></td>
+      <td class="c-items"><div>${(d.items||[]).length} รายการ</div><div class="sub">${esc(((d.items||[])[0]||{}).name || "")}</div></td>
+      <td class="r c-val">${val}</td>
+      <td class="c-status"><span class="chip ${esc(d.status||"draft")}">${STATUS_LABEL[d.status]||"ร่าง"}</span></td>
+      <td class="c-acts"><div class="rowacts">
         <button class="btn btn-ghost btn-sm" data-act="edit">แก้ไข</button>
         <button class="btn btn-ghost btn-sm" data-act="print">พิมพ์</button>
         <button class="btn btn-ghost btn-sm" data-act="dup">สำเนา</button>
@@ -1297,16 +1399,16 @@ function renderHistory(){
     const tr = el("tr","hrow");
     tr.setAttribute("aria-expanded","false"); tr.tabIndex = 0;
     tr.innerHTML = `<td><div class="cust">${esc(byCust ? last.prodName : last.custName)}</div></td>
-      <td>${esc(last.unit)}</td>
-      <td style="white-space:nowrap">${esc(thaiDate(last.dateISO))}</td>
-      <td class="r money"><b>${money(last.price)}</b></td>
-      <td class="r money">${money(lo)}</td>
-      <td class="r money">${money(hi)}</td>
-      <td class="r">${recs.length} ครั้ง</td>
-      <td class="r">${delta}</td>`;
+      <td data-label="หน่วย">${esc(last.unit)}</td>
+      <td data-label="ครั้งล่าสุด" style="white-space:nowrap">${esc(thaiDate(last.dateISO))}</td>
+      <td data-label="ราคาล่าสุด" class="r money"><b>${money(last.price)}</b></td>
+      <td data-label="ต่ำสุด" class="r money">${money(lo)}</td>
+      <td data-label="สูงสุด" class="r money">${money(hi)}</td>
+      <td data-label="เสนอแล้ว" class="r">${recs.length} ครั้ง</td>
+      <td data-label="เปลี่ยนแปลง" class="r c-delta">${delta}</td>`;
     const det = el("tr","hdetail"); det.hidden = true;
     const td = el("td"); td.colSpan = 8;
-    td.innerHTML = `<table class="mini"><thead><tr>
+    td.innerHTML = `<div class="tbl-wrap"><table class="mini"><thead><tr>
         <th>วันที่</th><th>เลขที่</th>${byCust ? "" : "<th>ลูกค้า</th>"}
         <th class="r">จำนวน</th><th class="r">ราคาต่อหน่วย</th><th class="r">จำนวนเงิน</th>
         <th>สถานะ</th><th></th></tr></thead>
@@ -1319,7 +1421,7 @@ function renderHistory(){
         <td class="r money">${r.formType === "price" ? "—" : money(r.qty * r.price)}</td>
         <td><span class="chip ${esc(r.status)}">${STATUS_LABEL[r.status]||"ร่าง"}</span></td>
         <td class="r"><button class="btn btn-ghost btn-sm" data-q="${esc(r.quoteId)}">เปิดเอกสาร</button></td>
-      </tr>`).join("")}</tbody></table>`;
+      </tr>`).join("")}</tbody></table></div>`;
     det.appendChild(td);
     td.querySelectorAll("[data-q]").forEach(b => b.onclick = (ev) => {
       ev.stopPropagation();
@@ -1462,17 +1564,18 @@ function renderItems(){
     ? `<tr><th></th><th>รายการสินค้า</th><th style="width:90px">หน่วย</th><th style="width:120px">ราคาต่อหน่วย</th><th></th></tr>`
     : `<tr><th></th><th>รายการสินค้า</th><th style="width:86px">จำนวน</th><th style="width:82px">หน่วย</th><th style="width:112px">ราคาต่อหน่วย</th><th style="width:110px" class="r">จำนวนเงิน</th><th></th></tr>`;
   const tb = $("itBody"); tb.innerHTML = "";
+  tb.parentElement.classList.toggle("price", isPrice);
   cur.items.forEach((it, i) => {
-    const tr = el("tr");
+    const tr = el("tr","it-row");
     const line = (Number(it.qty)||0)*(Number(it.price)||0);
     tr.innerHTML = `<td class="it-idx">${i+1}</td>
-      <td><input type="text" data-k="name" value="${esc(it.name)}" placeholder="ทรายคัดขนาดพิเศษขนาด …"></td>
-      ${isPrice ? "" : `<td><input type="number" step="0.001" class="num" data-k="qty" value="${it.qty??""}"></td>`}
-      <td><input type="text" data-k="unit" value="${esc(it.unit||"ตัน")}"></td>
-      <td><input type="number" step="0.01" class="num" data-k="price" value="${it.price??""}"></td>
-      ${isPrice ? "" : `<td class="r money" style="padding-top:13px">${money(line)}</td>`}
-      <td style="padding-top:9px"><button class="btn btn-ghost btn-sm" title="ลบรายการ">✕</button></td>`;
-    const hintRow = el("tr"); const hintCell = el("td"); hintCell.colSpan = 7;
+      <td class="it-name"><input type="text" data-k="name" value="${esc(it.name)}" placeholder="ทรายคัดขนาดพิเศษขนาด …" aria-label="รายการสินค้า"></td>
+      ${isPrice ? "" : `<td class="it-qty" data-label="จำนวน"><input type="number" step="0.001" class="num" data-k="qty" value="${it.qty??""}" inputmode="decimal"></td>`}
+      <td class="it-unit" data-label="หน่วย"><input type="text" data-k="unit" value="${esc(it.unit||"ตัน")}"></td>
+      <td class="it-price" data-label="ราคาต่อหน่วย"><input type="number" step="0.01" class="num" data-k="price" value="${it.price??""}" inputmode="decimal"></td>
+      ${isPrice ? "" : `<td class="r money it-amt" data-label="จำนวนเงิน">${money(line)}</td>`}
+      <td class="it-del"><button class="btn btn-ghost btn-sm" title="ลบรายการ">✕</button></td>`;
+    const hintRow = el("tr","it-hint"); const hintCell = el("td"); hintCell.colSpan = 7;
     hintRow.appendChild(el("td")); hintRow.appendChild(hintCell);
     const paintHint = () => { const h = pastPriceHint(it); hintCell.innerHTML = h ? `<div class="pricehint">${h}</div>` : ""; hintRow.hidden = !h; };
     paintHint();
@@ -1563,14 +1666,20 @@ $("e_saveCust").onclick = async () => {
 };
 
 function renderPreview(){ $("pvHost").innerHTML = renderDoc(cur); fitPreview(); }
-function fitPreview(){
-  const host = $("pvHost"); const box = host.parentElement;
+/** ย่อหน้า A4 (กว้าง 794px) ให้พอดีกรอบบนจอแคบ — ตอนพิมพ์ CSS คืนเป็นขนาดจริง */
+function fitA4(host){
+  const box = host.parentElement;
   if (!box) return;
-  const avail = box.clientWidth - 28;
+  const cs = getComputedStyle(box);
+  const avail = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
   if (avail < 120) return;               // panel not laid out yet — keep last good scale
-  host.style.zoom = Math.max(.4, Math.min(1, avail / 794));
+  host.style.zoom = Math.max(.3, Math.min(1, avail / 794));
 }
-window.addEventListener("resize", () => { if (view === "editor") fitPreview(); });
+function fitPreview(){ fitA4($("pvHost")); }
+window.addEventListener("resize", () => {
+  if (view === "editor") fitPreview();
+  if (!$("pvOverlay").hidden) fitA4($("pvFull"));
+});
 if (window.ResizeObserver){
   new ResizeObserver(() => { if (view === "editor") fitPreview(); }).observe($("pvHost").parentElement);
 }
@@ -1640,6 +1749,7 @@ function showPreview(d){
   pvDoc = d; $("pvFull").innerHTML = renderDoc(d);
   $("pvTitle").textContent = d.no + " · " + (d.customerName || d.attn || "");
   $("pvOverlay").hidden = false; document.body.style.overflow = "hidden";
+  fitA4($("pvFull"));
 }
 $("pvClose").onclick = () => { $("pvOverlay").hidden = true; document.body.style.overflow = ""; };
 $("pvPrint").onclick = () => window.print();
