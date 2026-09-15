@@ -649,7 +649,7 @@ table.items td:last-child{padding-right:0}
           <label class="f"><span>รูปแบบเลขที่หนังสือ</span>
             <input type="text" id="s_pattern">
           </label>
-          <div class="hint">ตัวแปรที่ใช้ได้: <code>{MM}</code> เดือน · <code>{DD}</code> วัน · <code>{BE}</code> ปี พ.ศ. · <code>{YY}</code> ปี พ.ศ. 2 หลัก · <code>{NNN}</code> ลำดับที่ในปี — ตัวอย่างเดิม <code>SS 0812/2569</code> มาจาก <code>SS {MM}{DD}/{BE}</code></div>
+          <div class="hint">ตัวแปรที่ใช้ได้: <code>{MM}</code> เดือน · <code>{DD}</code> วัน · <code>{NN}</code> ลำดับที่ในวันนั้น 01, 02, 03 · <code>{BE}</code> ปี พ.ศ. · <code>{YY}</code> ปี พ.ศ. 2 หลัก · <code>{NNN}</code> ลำดับที่ในปี — ค่าตั้งต้น <code>{MM}{DD}{NN}/{BE}</code> ได้ <code>091501/2569</code> · อยากมีคำนำหน้าให้พิมพ์เพิ่ม เช่น <code>SS {MM}{DD}{NN}/{BE}</code> · ไม่ว่ารูปแบบไหน ระบบจะไม่ยอมให้เลขที่ซ้ำกับใบอื่น</div>
           <label class="f"><span>ย่อหน้านำตั้งต้น</span><textarea id="s_intro" rows="2"></textarea></label>
           <div class="eyebrow" style="margin-top:6px">เงื่อนไขการเสนอราคาตั้งต้น</div>
           <div id="s_terms"></div>
@@ -726,7 +726,7 @@ const DEFAULT_CONFIG = {
   signerName: "นางสาวศุภาวีร์ เปี่ยมด้วยธรรม",
   signerTitle: "กรรมการ",
   vatRate: 7,
-  docNoPattern: "SS {MM}{DD}/{BE}",
+  docNoPattern: "{MM}{DD}{NN}/{BE}",
   defaultIntro: "บริษัทฯ มีความยินดีขอเสนอราคาทรายคัดขนาดพิเศษ เพื่อให้ท่านพิจารณาจัดซื้อดังรายละเอียดต่อไปนี้",
   defaultTerms: [
     {label:"การส่งมอบ", value:"3 วัน ภายหลังจากที่ได้รับใบสั่งซื้อ"},
@@ -753,7 +753,8 @@ const Store = {
     if (!r.ok){
       let msg = "HTTP " + r.status;
       try { msg = (await r.json()).error || msg; } catch(e){}
-      throw new Error(msg);
+      const err = new Error(msg); err.status = r.status;
+      throw err;
     }
     return r.json();
   },
@@ -763,6 +764,8 @@ const Store = {
       const d = await this.call("/bootstrap");
       hideLogin();
       this.config = Object.assign(JSON.parse(JSON.stringify(DEFAULT_CONFIG)), d.config || {});
+      // รูปแบบตั้งต้นรุ่นเก่าไม่มีเลขลำดับ ออกหลายใบในวันเดียวแล้วเลขซ้ำ จึงเปลี่ยนเป็นรูปแบบใหม่ให้
+      if (this.config.docNoPattern === "SS {MM}{DD}/{BE}") this.config.docNoPattern = DEFAULT_CONFIG.docNoPattern;
       this.customers = d.customers || [];
       this.products  = d.products  || [];
       this.quotations = d.quotations || [];
@@ -1132,9 +1135,9 @@ function openHistoryFor(q){
 let cur = null;
 
 function blankDoc(){
-  const c = Store.config;
+  const c = Store.config; const no = nextDocNo(todayISO());
   return {
-    id: null, no: nextDocNo(todayISO()), dateISO: todayISO(),
+    id: null, no, autoNo: no, dateISO: todayISO(),
     subject: "ขอเสนอราคาทรายคัดขนาดพิเศษ", attn: "", addr: "", phone: "",
     customerId: "", customerName: "", intro: c.defaultIntro, formType: "full",
     items: [{name:"", qty:1, unit:"ตัน", price:0}],
@@ -1142,15 +1145,39 @@ function blankDoc(){
     signerName: c.signerName, signerTitle: c.signerTitle, status: "draft", note: ""
   };
 }
+/** เลขที่นี้ถูกใช้กับใบอื่นแล้วหรือยัง — เลขที่ต้องไม่ซ้ำทั้งระบบ ไม่ว่าลูกค้าหรือวันที่ไหน */
+function noTaken(no, exceptId){
+  const k = String(no||"").trim();
+  return !!k && Store.quotations.some(q => q.id !== exceptId && String(q.no||"").trim() === k);
+}
 function nextDocNo(iso){
   const c = Store.config; const d = new Date((iso||todayISO())+"T00:00:00");
   const be = d.getFullYear()+543;
-  const n = Store.quotations.filter(q => (new Date((q.dateISO||"1970-01-01")+"T00:00:00")).getFullYear()+543 === be).length + 1;
-  return (c.docNoPattern||"SS {MM}{DD}/{BE}")
+  const pattern = c.docNoPattern || DEFAULT_CONFIG.docNoPattern;
+  const nYear = Store.quotations.filter(q => (new Date((q.dateISO||"1970-01-01")+"T00:00:00")).getFullYear()+543 === be).length + 1;
+  const fill = nn => pattern
     .replace("{MM}", String(d.getMonth()+1).padStart(2,"0"))
     .replace("{DD}", String(d.getDate()).padStart(2,"0"))
     .replace("{BE}", String(be)).replace("{YY}", String(be).slice(-2))
-    .replace("{NNN}", String(n).padStart(3,"0"));
+    .replace("{NNN}", String(nYear).padStart(3,"0"))
+    .replace("{NN}", nn);
+  if (pattern.includes("{NN}")){
+    // ลำดับในวัน = เลขสูงสุดของวันนั้นที่มีอยู่ + 1 ไม่ใช้การนับ เพราะลบใบกลาง ๆ ทิ้งแล้วเลขจะชน
+    const mark = " ";
+    const re = new RegExp("^" + fill(mark).replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(mark, "(\\d{2,})") + "$");
+    let n = Store.quotations.reduce((m, q) => {
+      const x = re.exec(String(q.no||"").trim());
+      return x ? Math.max(m, Number(x[1])) : m;
+    }, 0) + 1;
+    while (noTaken(fill(String(n).padStart(2,"0")))) n++;
+    return fill(String(n).padStart(2,"0"));
+  }
+  // รูปแบบที่ไม่มีเลขลำดับ ต่อท้าย -2, -3 เมื่อชน
+  const base = fill("");
+  if (!noTaken(base)) return base;
+  let i = 2;
+  while (noTaken(base + "-" + i)) i++;
+  return base + "-" + i;
 }
 
 function openEditor(id){
@@ -1158,16 +1185,6 @@ function openEditor(id){
   if (!cur.terms) cur.terms = JSON.parse(JSON.stringify(Store.config.defaultTerms));
   if (!cur.items || !cur.items.length) cur.items = [{name:"",qty:1,unit:"ตัน",price:0}];
   fillEditor(); go("editor");
-}
-/** ต่อท้าย -2, -3 … เมื่อเลขที่+วันที่+ลูกค้าชนกับใบอื่น — คงรูปแบบเลขที่ของบริษัทไว้ */
-function freeDocNo(no, iso, customer, exceptId){
-  const taken = n => Store.quotations.some(q => q.id !== exceptId &&
-    dedupeKey(q) === dedupeKey({no:n, dateISO:iso, customerName:customer}));
-  if (!taken(no)) return no;
-  const base = String(no).replace(/-\d+$/, "");
-  let i = 2;
-  while (taken(base + "-" + i)) i++;
-  return base + "-" + i;
 }
 function duplicate(d){
   const src = {no: d.no, dateISO: d.dateISO};
@@ -1178,7 +1195,7 @@ function duplicate(d){
   delete cur.source; delete cur.amounts; delete cur.createdAt; delete cur.updatedAt;
   cur.signerName = Store.config.signerName; cur.signerTitle = Store.config.signerTitle;
   cur.copiedFrom = src;
-  cur.no = freeDocNo(nextDocNo(cur.dateISO), cur.dateISO, cur.customerName || cur.attn, null);
+  cur.no = cur.autoNo = nextDocNo(cur.dateISO);
   fillEditor(); go("editor");
   toast("สำเนาจาก " + src.no + " (" + thaiDate(src.dateISO) + ") — ราคายังเป็นของใบเดิม ตรวจก่อนบันทึก");
 }
@@ -1210,7 +1227,12 @@ function readEditor(){
 ["e_no","e_date","e_status","e_subject","e_attn","e_addr","e_intro","e_vat","e_signer","e_signerTitle","e_note"]
   .forEach(id => $(id).addEventListener("input", () => { readEditor(); renderPreview(); }));
 
-$("e_gen").onclick = () => { $("e_no").value = nextDocNo($("e_date").value); readEditor(); renderPreview(); };
+$("e_gen").onclick = () => { $("e_no").value = nextDocNo($("e_date").value); readEditor(); cur.autoNo = cur.no; renderPreview(); };
+// เปลี่ยนวันที่ของใบใหม่ที่ใช้เลขอัตโนมัติ เลขที่ต้องเปลี่ยนตามวัน
+$("e_date").addEventListener("change", () => {
+  if (cur.id || !cur.autoNo || $("e_no").value.trim() !== cur.autoNo) return;
+  $("e_no").value = nextDocNo($("e_date").value); readEditor(); cur.autoNo = cur.no; renderPreview();
+});
 document.querySelectorAll("#e_type button").forEach(b => b.onclick = () => {
   cur.formType = b.dataset.t;
   document.querySelectorAll("#e_type button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
@@ -1335,17 +1357,25 @@ if (window.ResizeObserver){
   new ResizeObserver(() => { if (view === "editor") fitPreview(); }).observe($("pvHost").parentElement);
 }
 
+/** เสนอเลขที่ถัดไปที่ว่าง ถ้าผู้ใช้ตกลงจะใส่ให้ในฟอร์ม */
+function useNextNo(reason){
+  const next = nextDocNo(cur.dateISO);
+  if (!confirm(reason + "\n\nเปลี่ยนเป็นเลขที่ " + next + " แล้วบันทึกต่อ?")) return false;
+  cur.no = cur.autoNo = next; $("e_no").value = next;
+  return true;
+}
 async function saveEditorDoc(){
   readEditor();
   if (!cur.no.trim()) return toast("กรอกเลขที่หนังสือก่อน");
-  // เลขที่+วันที่+ลูกค้าคือคีย์ของใบ ถ้าชนแล้วบันทึก เซิร์ฟเวอร์จะทับใบเดิม จึงห้ามชน
-  const dup = Store.quotations.find(q => q.id !== cur.id && dedupeKey(q) === dedupeKey(cur));
-  if (dup){
-    if (cur.id) return toast("เลขที่ " + cur.no + " ซ้ำกับใบอื่นของลูกค้ารายนี้ในวันเดียวกัน เปลี่ยนเลขที่ก่อนบันทึก");
-    const next = freeDocNo(cur.no, cur.dateISO, cur.customerName || cur.attn, null);
-    if (!confirm("เลขที่ " + cur.no + " วันที่และลูกค้าเดียวกันมีอยู่แล้ว ถ้าบันทึกจะทับใบเดิม\n\nเปลี่ยนเป็นเลขที่ " + next + " แล้วบันทึกต่อ?")) return;
-    cur.no = next; $("e_no").value = next;
+  // เลขที่ต้องไม่ซ้ำกับใบอื่นทั้งระบบ ใบเก่าที่เลขซ้ำกันมาแต่เดิมยังแก้ได้ตราบที่ไม่เปลี่ยนเลข
+  const orig = cur.id ? Store.quotations.find(q => q.id === cur.id) : null;
+  const changed = !orig || String(orig.no||"").trim() !== cur.no;
+  if (changed && noTaken(cur.no, cur.id)){
+    if (cur.id) return toast("เลขที่ " + cur.no + " ถูกใช้กับใบอื่นแล้ว เปลี่ยนเลขที่ก่อนบันทึก");
+    if (!useNextNo("เลขที่ " + cur.no + " ถูกใช้กับใบอื่นแล้ว")) return;
   }
+  // จะบันทึกด้วยเลขนี้แล้ว ห้าม afterData คิดเลขใหม่ระหว่างที่กำลังบันทึก
+  delete cur.autoNo;
 
   // 1) ผูกทุกบรรทัดกับทะเบียนสินค้า สร้างรายการใหม่ให้ถ้ายังไม่มี — ประวัติราคาจึงจับกลุ่มได้ถูก
   for (const it of cur.items){
@@ -1360,14 +1390,21 @@ async function saveEditorDoc(){
   cur.amounts = cur.formType === "price" ? {subtotal:0, vat:0, total:0} : {subtotal:t.sub, vat:t.vat, total:t.total};
   cur.schemaVersion = 2;
 
-  const id = await Store.put("quotations", Object.assign({}, cur, {createOnly: !cur.id}));
+  const id = await Store.put("quotations", Object.assign({}, cur, {createOnly: !cur.id, checkNo: true}));
   cur.id = id; delete cur.copiedFrom;
   $("edState").textContent = "บันทึกแล้ว · " + cur.no;
   toast("บันทึกใบเสนอราคาเรียบร้อย");
   renderItems();
 }
-$("e_save").onclick = () => saveEditorDoc().catch(e => {
-  if (String(e && e.message) !== "unauthorized") toast("บันทึกไม่สำเร็จ: " + (e && e.message ? e.message : e));
+$("e_save").onclick = () => saveEditorDoc().catch(async e => {
+  if (String(e && e.message) === "unauthorized") return;
+  // 409 = อีกเครื่องบันทึกเลขนี้ไปก่อน รายการในหน้านี้เก่าแล้ว โหลดใหม่แล้วเสนอเลขถัดไป
+  if (e && e.status === 409 && !cur.id){
+    await Store.init();
+    if (useNextNo(e.message)) return $("e_save").onclick();
+    return;
+  }
+  toast("บันทึกไม่สำเร็จ: " + (e && e.message ? e.message : e));
 });
 $("e_del").onclick = async () => {
   if (!cur.id) return toast("ใบนี้ยังไม่ได้บันทึก");
@@ -2058,6 +2095,10 @@ function afterData(){
   if (view === "history") renderHistory();
   if (stageList.length) renderStage();
   if (view === "editor" && cur){ fillCustomerPick(); fillProductPick(); }
+  // ใบใหม่ที่ยังใช้เลขอัตโนมัติ: ข้อมูลเปลี่ยนแล้วเลขเดิมอาจชน จึงคิดใหม่
+  if (cur && !cur.id && cur.autoNo && cur.no === cur.autoNo){
+    cur.no = cur.autoNo = nextDocNo(cur.dateISO); $("e_no").value = cur.no; renderPreview();
+  }
 }
 $("fyear").innerHTML = `<option value="">ทุกปี</option>`;
 renderRegistry();

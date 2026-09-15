@@ -39,7 +39,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
     "signerName": "นางสาวศุภาวีร์ เปี่ยมด้วยธรรม",
     "signerTitle": "กรรมการ",
     "vatRate": 7,
-    "docNoPattern": "SS {MM}{DD}/{BE}",
+    "docNoPattern": "{MM}{DD}{NN}/{BE}",
     "defaultIntro": "บริษัทฯ มีความยินดีขอเสนอราคาทรายคัดขนาดพิเศษ เพื่อให้ท่านพิจารณาจัดซื้อดังรายละเอียดต่อไปนี้",
     "defaultTerms": [
         {"label": "การส่งมอบ", "value": "3 วัน ภายหลังจากที่ได้รับใบสั่งซื้อ"},
@@ -313,6 +313,14 @@ async def upsert_quotation(conn, d: dict) -> int:
     )
 
     qid = int(d["id"]) if str(d.get("id") or "").isdigit() else None
+    if d.get("checkNo") and vals[0]:
+        # เลขที่ต้องไม่ซ้ำกับใบอื่น ล็อกตามเลขที่ไว้จนจบ transaction กันสองเครื่องบันทึกเลขเดียวกันพร้อมกัน
+        await conn.execute("SELECT pg_advisory_xact_lock(hashtext($1))", vals[0])
+        old_no = await conn.fetchval("SELECT no FROM quotations WHERE id=$1", qid) if qid else None
+        if vals[0] != old_no and await conn.fetchval(
+                "SELECT 1 FROM quotations WHERE no=$1 AND ($2::bigint IS NULL OR id <> $2::bigint)",
+                vals[0], qid):
+            raise HTTPException(status_code=409, detail=f"เลขที่ {vals[0]} ถูกใช้กับใบอื่นไปแล้ว")
     if qid:
         await conn.execute(
             """UPDATE quotations SET
