@@ -1159,10 +1159,28 @@ function openEditor(id){
   if (!cur.items || !cur.items.length) cur.items = [{name:"",qty:1,unit:"ตัน",price:0}];
   fillEditor(); go("editor");
 }
+/** ต่อท้าย -2, -3 … เมื่อเลขที่+วันที่+ลูกค้าชนกับใบอื่น — คงรูปแบบเลขที่ของบริษัทไว้ */
+function freeDocNo(no, iso, customer, exceptId){
+  const taken = n => Store.quotations.some(q => q.id !== exceptId &&
+    dedupeKey(q) === dedupeKey({no:n, dateISO:iso, customerName:customer}));
+  if (!taken(no)) return no;
+  const base = String(no).replace(/-\d+$/, "");
+  let i = 2;
+  while (taken(base + "-" + i)) i++;
+  return base + "-" + i;
+}
 function duplicate(d){
-  cur = JSON.parse(JSON.stringify(d)); cur.id = null; cur.status = "draft";
-  cur.dateISO = todayISO(); cur.no = nextDocNo(cur.dateISO);
-  fillEditor(); go("editor"); toast("สร้างสำเนาแล้ว — ตรวจสอบแล้วกดบันทึก");
+  const src = {no: d.no, dateISO: d.dateISO};
+  cur = JSON.parse(JSON.stringify(d));
+  cur.id = null; cur.status = "draft"; cur.dateISO = todayISO();
+  // ของที่ผูกกับใบต้นทาง ไม่ควรติดมาในใบใหม่
+  cur.periodFrom = ""; cur.periodTo = "";
+  delete cur.source; delete cur.amounts; delete cur.createdAt; delete cur.updatedAt;
+  cur.signerName = Store.config.signerName; cur.signerTitle = Store.config.signerTitle;
+  cur.copiedFrom = src;
+  cur.no = freeDocNo(nextDocNo(cur.dateISO), cur.dateISO, cur.customerName || cur.attn, null);
+  fillEditor(); go("editor");
+  toast("สำเนาจาก " + src.no + " (" + thaiDate(src.dateISO) + ") — ราคายังเป็นของใบเดิม ตรวจก่อนบันทึก");
 }
 
 function fillEditor(){
@@ -1173,7 +1191,9 @@ function fillEditor(){
   $("e_signer").value = cur.signerName||Store.config.signerName;
   $("e_signerTitle").value = cur.signerTitle||Store.config.signerTitle;
   $("e_note").value = cur.note||"";
-  $("edState").textContent = cur.id ? "กำลังแก้ไข " + cur.no : "ใบใหม่";
+  $("edState").textContent = cur.id ? "กำลังแก้ไข " + cur.no
+    : cur.copiedFrom ? "สำเนาจาก " + cur.copiedFrom.no + " · ราคาเป็นของวันที่ " + thaiDate(cur.copiedFrom.dateISO)
+    : "ใบใหม่";
   document.querySelectorAll("#e_type button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.t === (cur.formType||"full"))));
   fillCustomerPick(); fillProductPick(); renderItems(); renderTerms(); renderPreview();
 }
@@ -1315,11 +1335,17 @@ if (window.ResizeObserver){
   new ResizeObserver(() => { if (view === "editor") fitPreview(); }).observe($("pvHost").parentElement);
 }
 
-$("e_save").onclick = async () => {
+async function saveEditorDoc(){
   readEditor();
   if (!cur.no.trim()) return toast("กรอกเลขที่หนังสือก่อน");
+  // เลขที่+วันที่+ลูกค้าคือคีย์ของใบ ถ้าชนแล้วบันทึก เซิร์ฟเวอร์จะทับใบเดิม จึงห้ามชน
   const dup = Store.quotations.find(q => q.id !== cur.id && dedupeKey(q) === dedupeKey(cur));
-  if (dup && !confirm("มีใบเลขที่ " + cur.no + " วันที่และลูกค้าเดียวกันอยู่แล้ว บันทึกเป็นอีกฉบับหรือไม่?")) return;
+  if (dup){
+    if (cur.id) return toast("เลขที่ " + cur.no + " ซ้ำกับใบอื่นของลูกค้ารายนี้ในวันเดียวกัน เปลี่ยนเลขที่ก่อนบันทึก");
+    const next = freeDocNo(cur.no, cur.dateISO, cur.customerName || cur.attn, null);
+    if (!confirm("เลขที่ " + cur.no + " วันที่และลูกค้าเดียวกันมีอยู่แล้ว ถ้าบันทึกจะทับใบเดิม\n\nเปลี่ยนเป็นเลขที่ " + next + " แล้วบันทึกต่อ?")) return;
+    cur.no = next; $("e_no").value = next;
+  }
 
   // 1) ผูกทุกบรรทัดกับทะเบียนสินค้า สร้างรายการใหม่ให้ถ้ายังไม่มี — ประวัติราคาจึงจับกลุ่มได้ถูก
   for (const it of cur.items){
@@ -1334,11 +1360,15 @@ $("e_save").onclick = async () => {
   cur.amounts = cur.formType === "price" ? {subtotal:0, vat:0, total:0} : {subtotal:t.sub, vat:t.vat, total:t.total};
   cur.schemaVersion = 2;
 
-  const id = await Store.put("quotations", cur);
-  cur.id = id; $("edState").textContent = "บันทึกแล้ว · " + cur.no;
+  const id = await Store.put("quotations", Object.assign({}, cur, {createOnly: !cur.id}));
+  cur.id = id; delete cur.copiedFrom;
+  $("edState").textContent = "บันทึกแล้ว · " + cur.no;
   toast("บันทึกใบเสนอราคาเรียบร้อย");
   renderItems();
-};
+}
+$("e_save").onclick = () => saveEditorDoc().catch(e => {
+  if (String(e && e.message) !== "unauthorized") toast("บันทึกไม่สำเร็จ: " + (e && e.message ? e.message : e));
+});
 $("e_del").onclick = async () => {
   if (!cur.id) return toast("ใบนี้ยังไม่ได้บันทึก");
   if (!confirm("ลบใบเสนอราคา " + cur.no + " ?")) return;

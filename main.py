@@ -325,15 +325,9 @@ async def upsert_quotation(conn, d: dict) -> int:
             *vals, qid,
         )
     else:
-        qid = await conn.fetchval(
-            """INSERT INTO quotations (
-                 no, dedupe_key, doc_date, period_from, period_to, subject, customer_id,
-                 customer_name, attn, addr, phone, intro, form_type, doc_kind, vat_mode, vat_rate,
-                 subtotal, vat, total, status, signer_name, signer_title, note,
-                 source_kind, source_file, search_text)
-               VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,
-                       $17,$18,$19,$20,$21,$22,$23,$24,$25,$26)
-               ON CONFLICT (dedupe_key) DO UPDATE SET
+        # createOnly มาจากปุ่มบันทึกใบใหม่ในฟอร์มเท่านั้น ห้ามทับใบเดิมที่คีย์ซ้ำ
+        # ส่วนกู้คืน JSON / seed ไม่ส่งมา จึงยัง upsert ทับได้เหมือนเดิม
+        on_conflict = "DO NOTHING" if d.get("createOnly") else """DO UPDATE SET
                  no=EXCLUDED.no, doc_date=EXCLUDED.doc_date,
                  period_from=EXCLUDED.period_from, period_to=EXCLUDED.period_to,
                  subject=EXCLUDED.subject, customer_id=EXCLUDED.customer_id,
@@ -344,10 +338,25 @@ async def upsert_quotation(conn, d: dict) -> int:
                  status=EXCLUDED.status, signer_name=EXCLUDED.signer_name,
                  signer_title=EXCLUDED.signer_title, note=EXCLUDED.note,
                  source_kind=EXCLUDED.source_kind, source_file=EXCLUDED.source_file,
-                 search_text=EXCLUDED.search_text, updated_at=now()
+                 search_text=EXCLUDED.search_text, updated_at=now()"""
+        qid = await conn.fetchval(
+            """INSERT INTO quotations (
+                 no, dedupe_key, doc_date, period_from, period_to, subject, customer_id,
+                 customer_name, attn, addr, phone, intro, form_type, doc_kind, vat_mode, vat_rate,
+                 subtotal, vat, total, status, signer_name, signer_title, note,
+                 source_kind, source_file, search_text)
+               VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,
+                       $17,$18,$19,$20,$21,$22,$23,$24,$25,$26)
+               ON CONFLICT (dedupe_key) """ + on_conflict + """
                RETURNING id""",
             *vals,
         )
+        if qid is None:
+            raise HTTPException(
+                status_code=409,
+                detail=f"มีใบเลขที่ {d.get('no') or ''} วันที่ {d.get('dateISO') or ''} "
+                       "ของลูกค้ารายนี้อยู่แล้ว เปลี่ยนเลขที่ก่อนบันทึก",
+            )
 
     await conn.execute("DELETE FROM quotation_items WHERE quotation_id=$1", qid)
     await conn.execute("DELETE FROM quotation_terms WHERE quotation_id=$1", qid)
