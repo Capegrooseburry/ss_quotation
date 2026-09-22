@@ -495,6 +495,10 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
             <tbody id="regBody"></tbody>
           </table>
         </div>
+        <div class="inline" id="regPager" style="justify-content:space-between;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap" hidden>
+          <span class="hint" id="regPageInfo"></span>
+          <div class="inline" id="regPageBtns" style="gap:4px;flex-wrap:wrap"></div>
+        </div>
         <div class="empty" id="regEmpty" hidden>ยังไม่มีใบเสนอราคาที่ตรงกับเงื่อนไข</div>
       </div>
     </section>
@@ -1223,6 +1227,9 @@ function go(v){
 $("tabs").addEventListener("click", e => { const b = e.target.closest(".tab"); if (b) go(b.dataset.view); });
 
 /* ---------------- registry ---------------- */
+const REG_PAGE_SIZE = 10;
+let regPage = 1;
+
 function filtered(){
   const q = ($("fq").value||"").trim().toLowerCase();
   const yr = $("fyear").value, st = $("fstatus").value, from = $("ffrom").value, to = $("fto").value;
@@ -1254,8 +1261,14 @@ function renderRegistry(){
     ["ตารางราคา", priceLists, "ฉบับ (เสนอราคาต่อหน่วย)"]
   ].map(([k,v,u]) => `<div class="stat"><span class="eyebrow">${k}</span><b>${v}</b><span class="unit">${u}</span></div>`).join("");
 
+  // แบ่งหน้า หน้าละ REG_PAGE_SIZE ใบ (list เรียงจากวันที่ออกเอกสารล่าสุดแล้ว)
+  const pages = Math.max(1, Math.ceil(list.length / REG_PAGE_SIZE));
+  regPage = Math.min(Math.max(1, regPage), pages);
+  const start = (regPage - 1) * REG_PAGE_SIZE;
+  const pageList = list.slice(start, start + REG_PAGE_SIZE);
+
   const tb = $("regBody"); tb.innerHTML = "";
-  list.forEach(d => {
+  pageList.forEach(d => {
     const tr = el("tr");
     const val = d.formType === "price" ? `<span class="sub">ตารางราคา</span>` : `<span class="money">${money(docValue(d))}</span>`;
     tr.innerHTML = `
@@ -1279,7 +1292,35 @@ function renderRegistry(){
   });
   $("regEmpty").hidden = list.length > 0;
   $("regTable").hidden = list.length === 0;
+  renderRegPager(list.length, pages, start, pageList.length);
   if (view === "io") $("expCount").textContent = list.length;
+}
+
+function renderRegPager(total, pages, start, shown){
+  $("regPager").hidden = total === 0;
+  $("regPageInfo").textContent = total ? `แสดง ${start + 1}–${start + shown} จาก ${total} ใบ` : "";
+  const box = $("regPageBtns"); box.innerHTML = "";
+  if (pages <= 1) return;
+  const btn = (label, page, opts = {}) => {
+    const b = el("button");
+    b.type = "button";
+    b.className = "btn btn-sm " + (opts.active ? "btn-primary" : "btn-ghost");
+    b.textContent = label;
+    if (opts.disabled) b.disabled = true;
+    else b.onclick = () => { regPage = page; renderRegistry(); $("regTable").scrollIntoView({block:"start", behavior:"smooth"}); };
+    if (opts.active) b.setAttribute("aria-current", "page");
+    box.appendChild(b);
+  };
+  btn("‹ ก่อนหน้า", regPage - 1, {disabled: regPage === 1});
+  // เลขหน้า: หน้าแรก หน้าสุดท้าย และรอบหน้าปัจจุบัน ที่เหลือย่อเป็น …
+  let last = 0;
+  for (let p = 1; p <= pages; p++){
+    if (p !== 1 && p !== pages && Math.abs(p - regPage) > 1) continue;
+    if (p - last > 1){ const s = el("span"); s.className = "hint"; s.textContent = "…"; s.style.padding = "0 4px"; box.appendChild(s); }
+    btn(String(p), p, {active: p === regPage});
+    last = p;
+  }
+  btn("ถัดไป ›", regPage + 1, {disabled: regPage === pages});
 }
 
 function refreshYears(){
@@ -1288,8 +1329,9 @@ function refreshYears(){
   sel.innerHTML = `<option value="">ทุกปี</option>` + years.map(y => `<option value="${y}">${y}</option>`).join("");
   if (years.map(String).includes(cur)) sel.value = cur;
 }
-["fq","fstatus","ffrom","fto","fyear"].forEach(id => $(id).addEventListener("input", renderRegistry));
-$("fclear").onclick = () => { ["fq","fstatus","ffrom","fto","fyear"].forEach(id => $(id).value = ""); renderRegistry(); };
+// เปลี่ยนเงื่อนไขกรองเมื่อไร กลับไปหน้า 1
+["fq","fstatus","ffrom","fto","fyear"].forEach(id => $(id).addEventListener("input", () => { regPage = 1; renderRegistry(); }));
+$("fclear").onclick = () => { ["fq","fstatus","ffrom","fto","fyear"].forEach(id => $(id).value = ""); regPage = 1; renderRegistry(); };
 
 /* ---------------- price history ----------------
    ตอบคำถามหลัก: "เคยเสนอราคาลูกค้ารายนี้ไปเท่าไหร่"
