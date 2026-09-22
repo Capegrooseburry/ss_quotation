@@ -1179,7 +1179,7 @@ function renderDocModern(q){
       </div>
     </header>
     <section class="m-cust">
-      <div class="m-cust-h">เสนอให้ <small>(Prepared For)</small></div>
+      <div class="m-cust-h">ชื่อลูกค้า <small>(Customer)</small></div>
       <div class="m-cust-b">
         <div>
           <div class="m-cust-name">${esc(custName)}</div>
@@ -2448,7 +2448,7 @@ function buildDocXmlModern(q){
     q.custTaxId ? "เลขประจำตัวผู้เสียภาษี " + q.custTaxId : ""].filter(Boolean).map(s => wP(s, {sz:24, color:MUTED})).join("") || wP("");
   const cw = [5200, 3910];
   body += tbl([W], `<w:tr>${wCellXml(W,
-    wP("เสนอให้ (Prepared For)", {b:true, sz:26, after:60})
+    wP("ชื่อลูกค้า (Customer)", {b:true, sz:26, after:60})
     + tbl(cw, `<w:tr>${wCellXml(cw[0], custLeft)}${wCellXml(cw[1], custRight)}</w:tr>`),
     {shade:GREY, borders:box("F3F4F6"), pad:120})}</w:tr>`);
   body += wP("", {after:120});
