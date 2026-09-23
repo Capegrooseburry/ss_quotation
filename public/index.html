@@ -18,24 +18,25 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root{
-  --ground:#F4F6F8;
+  --ground:#F8F9FA;
   --surface:#FFFFFF;
-  --surface-2:#EDF0F3;
-  --ink:#161E26;
-  --ink-2:#4A5764;
-  --ink-3:#78868F;
-  --line:#D9E0E6;
-  --line-strong:#BCC7D0;
-  --accent:#FF6347;
+  --surface-2:#EDF4FB;
+  --ink:#12263F;
+  --ink-2:#46596E;
+  --ink-3:#77879A;
+  --ink-head:#0047AB;
+  --line:#DCE6F0;
+  --line-strong:#BCCEE0;
+  --accent:#1E90FF;
   --accent-ink:#FFFFFF;
-  --accent-soft:#FFECE8;
-  --accent-line:#FFB4A6;
+  --accent-soft:#E0F6FF;
+  --accent-line:#A3D6FF;
   --s-draft:#6B7A87;
   --s-sent:#20608F;
   --s-won:#4E7A24;
   --s-lost:#A23227;
   --warn:#9A6A12;
-  --shadow:0 1px 2px rgba(22,30,38,.06), 0 8px 24px -14px rgba(22,30,38,.28);
+  --shadow:0 1px 2px rgba(16,42,73,.06), 0 8px 24px -14px rgba(16,42,73,.28);
   --r:10px;
   --font-ui:"IBM Plex Sans Thai","Noto Sans Thai",system-ui,-apple-system,"Segoe UI",sans-serif;
   --font-doc:"Sarabun","TH Sarabun New","Noto Sans Thai",serif;
@@ -44,18 +45,19 @@
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --ground:#0E1419;
-    --surface:#161E25;
-    --surface-2:#1E2830;
-    --ink:#E4EAEF;
-    --ink-2:#A9B6C0;
-    --ink-3:#7E8C97;
-    --line:#2A3640;
-    --line-strong:#3A4854;
-    --accent:#45BFA8;
-    --accent-ink:#07231F;
-    --accent-soft:#16332E;
-    --accent-line:#2C5B52;
+    --ground:#0B1620;
+    --surface:#121E2A;
+    --surface-2:#1A2836;
+    --ink:#E6EEF6;
+    --ink-2:#A8BACB;
+    --ink-3:#7C8FA3;
+    --ink-head:#8CC8FF;
+    --line:#24344A;
+    --line-strong:#35485F;
+    --accent:#4DA6FF;
+    --accent-ink:#04203D;
+    --accent-soft:#142B44;
+    --accent-line:#2B5580;
     --s-draft:#8B99A5;
     --s-sent:#63A6D8;
     --s-won:#93C15E;
@@ -66,18 +68,19 @@
   }
 }
 :root[data-theme="dark"]{
-  --ground:#0E1419;
-  --surface:#161E25;
-  --surface-2:#1E2830;
-  --ink:#E4EAEF;
-  --ink-2:#A9B6C0;
-  --ink-3:#7E8C97;
-  --line:#2A3640;
-  --line-strong:#3A4854;
-  --accent:#FF6347;
-  --accent-ink:#FFFFFF;
-  --accent-soft:#3A1E19;
-  --accent-line:#7A3326;
+  --ground:#0B1620;
+  --surface:#121E2A;
+  --surface-2:#1A2836;
+  --ink:#E6EEF6;
+  --ink-2:#A8BACB;
+  --ink-3:#7C8FA3;
+  --ink-head:#8CC8FF;
+  --line:#24344A;
+  --line-strong:#35485F;
+  --accent:#4DA6FF;
+  --accent-ink:#04203D;
+  --accent-soft:#142B44;
+  --accent-line:#2B5580;
   --s-draft:#8B99A5;
   --s-sent:#63A6D8;
   --s-won:#93C15E;
@@ -89,7 +92,7 @@
 
 *{box-sizing:border-box}
 body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--font-ui);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
-h1,h2,h3{margin:0;text-wrap:balance;font-weight:600;letter-spacing:-.01em}
+h1,h2,h3{margin:0;text-wrap:balance;font-weight:600;letter-spacing:-.01em;color:var(--ink-head)}
 button,input,select,textarea{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
@@ -102,7 +105,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .brand{display:flex;align-items:center;gap:10px;min-width:0}
 .mark{font-family:var(--font-mono);font-weight:500;font-size:13px;letter-spacing:.06em;
   background:var(--accent);color:var(--accent-ink);padding:6px 8px;border-radius:6px;white-space:nowrap}
-.brand-name{font-weight:600;font-size:15px;line-height:1.2}
+.brand-name{font-weight:600;font-size:15px;line-height:1.2;color:var(--ink-head)}
 .brand-sub{font-size:11.5px;color:var(--ink-3);line-height:1.3}
 .tabs{display:flex;gap:2px;flex-wrap:wrap;margin-inline-start:auto}
 .tab{background:none;border:1px solid transparent;padding:7px 12px;border-radius:999px;cursor:pointer;color:var(--ink-2);font-size:13.5px}
