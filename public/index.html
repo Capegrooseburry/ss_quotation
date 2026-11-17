@@ -1111,6 +1111,13 @@ function renderDocLetter(q){
   </div>`;
 }
 
+/** บรรทัดหลักในกล่อง "ชื่อลูกค้า" ของแบบเชิงพาณิชย์ ใช้ทั้งหน้าจอและไฟล์ Word
+    แสดงข้อความช่องเรียนตามที่พิมพ์ (ผู้รับ / ตำแหน่ง / บริษัท) แทนชื่อจากทะเบียน
+    ช่องเรียนว่างจึงใช้ชื่อลูกค้าแทน */
+function custHeadOf(q){
+  const attn = String(q.attn||"").trim().replace(/^เรียน\s*/, "");
+  return attn ? "เรียน " + attn : (q.customerName || "");
+}
 /* แบบใบเสนอราคาเชิงพาณิชย์ — ใบที่สร้างหรือสำเนาจากฟอร์มหลังเพิ่มรูปแบบนี้ */
 function renderDocModern(q){
   const c = Store.config, t = calc(q);
@@ -1137,8 +1144,7 @@ function renderDocModern(q){
     q.validDays != null && q.validDays !== "" ? ["ยืนราคา (Valid)", esc(q.validDays) + " วัน"] : null
   ].filter(Boolean).map(([k, v]) => `<tr><th>${k}</th><td>${v}</td></tr>`).join("");
 
-  const custName = q.customerName || String(q.attn||"").split("\n")[0];
-  const attnLine = q.attn && q.attn !== custName ? q.attn : "";
+  const custHead = custHeadOf(q);
   const contact = lines([
     q.phone ? "โทร. " + esc(q.phone) : "",
     q.custEmail ? "อีเมล " + esc(q.custEmail) : "",
@@ -1189,8 +1195,7 @@ function renderDocModern(q){
       <div class="m-cust-h">ชื่อลูกค้า <small>(Customer)</small></div>
       <div class="m-cust-b">
         <div>
-          <div class="m-cust-name">${esc(custName)}</div>
-          ${attnLine ? `<div class="m-pre">เรียน ${esc(attnLine)}</div>` : ""}
+          <div class="m-cust-name m-pre">${esc(custHead)}</div>
           ${q.addr ? `<div class="m-pre">${esc(q.addr)}</div>` : ""}
         </div>
         <div>${contact}</div>
@@ -2525,10 +2530,7 @@ function buildDocXmlModern(q){
   body += `<w:p><w:pPr><w:pBdr><w:bottom w:val="single" w:sz="12" w:color="9CA3AF"/></w:pBdr><w:spacing w:before="0" w:after="200"/></w:pPr></w:p>`;
 
   // กล่องลูกค้า
-  const custName = q.customerName || String(q.attn||"").split("\n")[0];
-  const attnLine = q.attn && q.attn !== custName ? q.attn : "";
-  const custLeft = wP(custName, {b:true, sz:30})
-    + (attnLine ? wP("เรียน " + attnLine, {sz:24, color:MUTED}) : "")
+  const custLeft = wP(custHeadOf(q), {b:true, sz:30})
     + (q.addr ? wP(q.addr, {sz:24, color:MUTED}) : "");
   const custRight = [q.phone ? "โทร. " + q.phone : "", q.custEmail ? "อีเมล " + q.custEmail : "",
     q.custTaxId ? "เลขประจำตัวผู้เสียภาษี " + q.custTaxId : ""].filter(Boolean).map(s => wP(s, {sz:24, color:MUTED})).join("") || wP("");
