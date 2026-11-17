@@ -686,7 +686,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
               <label class="f"><span>เลขประจำตัวผู้เสียภาษี</span><input type="text" id="c_tax"></label>
             </div>
             <label class="f"><span>อีเมล</span><input type="email" id="c_email"></label>
-            <div class="inline"><button class="btn btn-primary btn-sm" id="c_add">เพิ่ม / อัปเดตลูกค้า</button>
+            <div class="inline"><button class="btn btn-primary btn-sm" id="c_add">เพิ่มลูกค้าใหม่</button>
               <button class="btn btn-sm" id="c_clear">ล้างฟอร์ม</button></div>
           </div>
           <div class="tbl-wrap"><table class="data" style="min-width:0"><tbody id="custBody"></tbody></table></div>
@@ -1688,10 +1688,32 @@ function fillProductPick(){
 }
 $("e_saveCust").onclick = async () => {
   readEditor();
-  const name = (cur.customerName || cur.attn || "").trim();
-  if (!name) return toast("กรอกชื่อ/ผู้รับก่อน");
-  const id = await Store.put("customers", {name, attn:"", addr:cur.addr, phone:cur.phone||"", tax:cur.custTaxId||"", email:cur.custEmail||""});
-  cur.customerId = id; cur.customerName = name; toast("เพิ่มลูกค้าแล้ว"); fillCustomerPick();
+  // ชื่อต้องมาจากช่องที่พิมพ์อยู่ตอนนี้ cur.customerName อาจค้างมาจากลูกค้าที่เคยเลือกหรือใบที่เปิดมา
+  const attnText = String(cur.attn || "").trim();
+  if (!attnText) return toast("กรอกช่อง เรียน ก่อน");
+  const firstLine = attnText.split("\n").map(s => s.trim()).find(Boolean) || "";
+  const guess = guessCustomerName(attnText + "\n" + (cur.addr || "")) || firstLine;
+  const input = prompt("ชื่อลูกค้าใหม่ที่จะบันทึกลงทะเบียน", guess);
+  if (input === null) return;
+  const name = input.replace(/\s+/g, " ").trim();
+  if (!name) return toast("กรอกชื่อลูกค้า");
+  // ข้อความที่เหลือในช่องเรียน (เช่น ฝ่ายจัดซื้อ) เก็บเป็นผู้ติดต่อ เลือกรายนี้ครั้งหน้าจะได้ข้อความเรียนเดิมกลับมา
+  const flat = attnText.replace(/\s+/g, " ");
+  const attn = flat.includes(name) ? flat.replace(name, "").replace(/\s+/g, " ").trim() : "";
+  try {
+    const id = await Store.put("customers", {name, attn, addr:cur.addr||"", phone:cur.phone||"",
+      tax:cur.custTaxId||"", email:cur.custEmail||"", createOnly:true});
+    cur.customerId = id; cur.customerName = name;
+    toast("เพิ่มลูกค้า " + name + " แล้ว");
+  } catch(e){
+    if (String(e.message) === "unauthorized") return;
+    if (e.status !== 409) return toast("บันทึกลูกค้าไม่สำเร็จ: " + e.message);
+    // ชื่อซ้ำกับรายเดิม ผูกใบนี้กับรายเดิมแทน
+    const old = Store.customers.find(c => (c.nameKey || nkey(c.name)) === nkey(name));
+    if (old){ cur.customerId = old.id; cur.customerName = old.name; }
+    toast(e.message + (old ? " — เลือกรายเดิมให้แล้ว" : ""));
+  }
+  fillCustomerPick(); renderPreview();
 };
 
 function renderPreview(){ $("pvHost").innerHTML = renderDoc(cur); fitPreview(); }
@@ -1797,9 +1819,17 @@ function renderMaster(){
     tr.querySelector('[data-a="e"]').onclick = () => {
       $("c_name").value = c.name||""; $("c_attn").value = c.attn||""; $("c_addr").value = c.addr||"";
       $("c_phone").value = c.phone||""; $("c_tax").value = c.tax||""; $("c_email").value = c.email||"";
-      $("c_add").dataset.id = c.id;
+      $("c_add").dataset.id = c.id; $("c_add").textContent = "บันทึกการแก้ไข";
+      $("c_name").focus();
     };
-    tr.querySelector('[data-a="d"]').onclick = async () => { if(confirm("ลบลูกค้า "+c.name+"?")) { await Store.remove("customers", c.id); renderMaster(); } };
+    tr.querySelector('[data-a="d"]').onclick = async () => {
+      if (!confirm("ลบลูกค้า "+c.name+"?")) return;
+      try { await Store.remove("customers", c.id); }
+      catch(e){ if (String(e.message) !== "unauthorized") toast("ลบไม่สำเร็จ: " + e.message); return; }
+      // ลบรายที่เปิดแก้อยู่ ต้องล้างฟอร์ม ไม่งั้นกดบันทึกแล้วจะชี้ไปที่ id ที่ไม่มีแล้ว
+      if ($("c_add").dataset.id === c.id) $("c_clear").click();
+      renderMaster();
+    };
     cb.appendChild(tr);
   });
   const pb = $("prodBody"); pb.innerHTML = "";
@@ -1817,10 +1847,21 @@ function renderMaster(){
 }
 $("c_add").onclick = async () => {
   const name = $("c_name").value.trim(); if (!name) return toast("กรอกชื่อลูกค้า");
-  await Store.put("customers", {id:$("c_add").dataset.id||null, name, attn:$("c_attn").value, addr:$("c_addr").value, phone:$("c_phone").value, tax:$("c_tax").value, email:$("c_email").value.trim()});
-  $("c_clear").click(); toast("บันทึกลูกค้าแล้ว"); renderMaster();
+  const id = $("c_add").dataset.id || null;
+  try {
+    // ไม่มี id = เพิ่มรายใหม่ ชื่อซ้ำกับรายเดิมให้เซิร์ฟเวอร์ตอบ 409 แทนการรวมเข้ารายเดิมเงียบ ๆ
+    await Store.put("customers", {id, createOnly:!id, name, attn:$("c_attn").value, addr:$("c_addr").value, phone:$("c_phone").value, tax:$("c_tax").value, email:$("c_email").value.trim()});
+  } catch(e){
+    // คงข้อมูลในฟอร์มไว้ให้แก้แล้วกดใหม่
+    if (String(e.message) !== "unauthorized") toast("บันทึกลูกค้าไม่สำเร็จ: " + e.message);
+    return;
+  }
+  $("c_clear").click(); toast(id ? "บันทึกการแก้ไขแล้ว" : "เพิ่มลูกค้า " + name + " แล้ว"); renderMaster();
 };
-$("c_clear").onclick = () => { ["c_name","c_attn","c_addr","c_phone","c_tax","c_email"].forEach(i=>$(i).value=""); delete $("c_add").dataset.id; };
+$("c_clear").onclick = () => {
+  ["c_name","c_attn","c_addr","c_phone","c_tax","c_email"].forEach(i=>$(i).value="");
+  delete $("c_add").dataset.id; $("c_add").textContent = "เพิ่มลูกค้าใหม่";
+};
 $("p_add").onclick = async () => {
   const name = $("p_name").value.trim(); if (!name) return toast("กรอกชื่อสินค้า");
   await Store.put("products", {id:$("p_add").dataset.id||null, name, nameKey:nkey(name), unit:$("p_unit").value||"ตัน", price:Number($("p_price").value)||0});

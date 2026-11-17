@@ -16,6 +16,7 @@ import time
 from contextlib import asynccontextmanager
 from typing import Any
 
+import asyncpg
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -501,11 +502,30 @@ async def save_customer(request: Request):
             d.get("phone") or "", d.get("tax") or "", d.get("note") or "", d.get("email") or "")
     async with db.pool().acquire() as conn:
         if str(d.get("id") or "").isdigit():
+            try:
+                row = await conn.fetchrow(
+                    """UPDATE customers SET name=$1, name_key=$2, attn=$3, addr=$4, phone=$5,
+                         tax_id=$6, note=$7, email=$8, updated_at=now() WHERE id=$9 RETURNING *""",
+                    *args, int(d["id"]),
+                )
+            except asyncpg.UniqueViolationError:
+                raise HTTPException(status_code=409,
+                                    detail=f"ชื่อ {name} ซ้ำกับลูกค้ารายอื่นในทะเบียน")
+            if row is None:
+                raise HTTPException(status_code=404,
+                                    detail="ไม่พบลูกค้ารายนี้ในทะเบียน อาจถูกลบไปแล้ว")
+        elif d.get("createOnly"):
+            # มาจากปุ่มเพิ่มลูกค้าในหน้าเว็บ ห้ามรวมเข้ารายเดิมเงียบ ๆ เมื่อชื่อซ้ำ
             row = await conn.fetchrow(
-                """UPDATE customers SET name=$1, name_key=$2, attn=$3, addr=$4, phone=$5,
-                     tax_id=$6, note=$7, email=$8, updated_at=now() WHERE id=$9 RETURNING *""",
-                *args, int(d["id"]),
+                """INSERT INTO customers (name, name_key, attn, addr, phone, tax_id, note, email)
+                   VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+                   ON CONFLICT (name_key) DO NOTHING
+                   RETURNING *""",
+                *args,
             )
+            if row is None:
+                raise HTTPException(status_code=409,
+                                    detail=f"มีลูกค้าชื่อ {name} อยู่ในทะเบียนแล้ว")
         else:
             # ไฟล์สำรองรุ่นก่อนมีช่องอีเมลจะส่งอีเมลว่างมา อย่าให้ลบอีเมลที่มีอยู่แล้วทิ้ง
             row = await conn.fetchrow(
